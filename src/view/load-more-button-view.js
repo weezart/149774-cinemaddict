@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import View from './view';
 
 const createLoadMoreButtonTemplate = () => (
   `<button class="films-list__show-more">
@@ -6,20 +6,12 @@ const createLoadMoreButtonTemplate = () => (
   </button>`
 );
 
-export default class LoadMoreButtonView {
+export default class LoadMoreButtonView extends View {
+  constructor() {
+    super();
+  }
+
   getTemplate() {
     return createLoadMoreButtonTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

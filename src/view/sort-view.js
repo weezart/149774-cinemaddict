@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import View from './view';
 
 const createSortTemplate = () => (
   `<ul class="sort">
@@ -8,20 +8,12 @@ const createSortTemplate = () => (
   </ul>`
 );
 
-export default class SortView {
+export default class SortView extends View {
+  constructor() {
+    super();
+  }
+
   getTemplate() {
     return createSortTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

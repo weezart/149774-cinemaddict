@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import View from './view';
 
 const createFilmsListTopRatedTemplate = () => (
   `<section class="films-list--extra">
@@ -7,20 +7,12 @@ const createFilmsListTopRatedTemplate = () => (
   `
 );
 
-export default class FilmsListTopRatedView {
+export default class FilmsListTopRatedView extends View {
+  constructor() {
+    super();
+  }
+
   getTemplate() {
     return createFilmsListTopRatedTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

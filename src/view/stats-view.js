@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import View from './view';
 
 const createStatsTemplate = () => (
   `<section class="footer__statistics">
@@ -6,20 +6,12 @@ const createStatsTemplate = () => (
   </section>`
 );
 
-export default class StatsView {
+export default class StatsView extends View {
+  constructor() {
+    super();
+  }
+
   getTemplate() {
     return createStatsTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }
