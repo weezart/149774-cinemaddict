@@ -16,15 +16,18 @@ export default class FilmsPresenter {
   filmsContainerTopRatedComponent = new FilmsContainer();
   filmsContainerMostCommentedComponent = new FilmsContainer();
 
-  init = (filmsContainer) => {
+  init = (filmsContainer, filmsModel) => {
     this.filmsContainer = filmsContainer;
+    this.filmsModel = filmsModel;
+    this.filmsList = [...this.filmsModel.getFilms()];
+    this.comments = [...this.filmsModel.getComments()];
 
     render(this.filmsComponent, this.filmsContainer);
     render(this.filmsListComponent, this.filmsComponent.getElement());
     render(this.filmsContainerComponent, this.filmsListComponent.getElement());
 
-    for (let i = 0; i < 5; i++) {
-      render(new FilmCardView(), this.filmsContainerComponent.getElement());
+    for (let i = 0; i < this.filmsList.length; i++) {
+      render(new FilmCardView(this.filmsList[i]), this.filmsContainerComponent.getElement());
     }
 
     render(this.filmsListTopRatedComponent, this.filmsComponent.getElement());
@@ -34,8 +37,8 @@ export default class FilmsPresenter {
     render(this.filmsContainerMostCommentedComponent, this.filmsListMostCommentedComponent.getElement());
 
     for (let i = 0; i < 2; i++) {
-      render(new FilmCardView(), this.filmsContainerTopRatedComponent.getElement());
-      render(new FilmCardView(), this.filmsContainerMostCommentedComponent.getElement());
+      render(new FilmCardView(this.filmsList[i]), this.filmsContainerTopRatedComponent.getElement());
+      render(new FilmCardView(this.filmsList[i]), this.filmsContainerMostCommentedComponent.getElement());
     }
 
     render(new LoadMoreButtonView(), this.filmsListComponent.getElement());
