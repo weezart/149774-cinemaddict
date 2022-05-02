@@ -16,11 +16,10 @@ const getRandomArrayItem = (array) => {
 };
 
 // Массив заданной длины случайных элементов.
-const getRandomizedReducedArray = (array, count) => {
-  return array.slice().sort(() => Math.random() - 0.5).slice(0, count);
-};
+const getRandomizedReducedArray = (array, count) => array.slice().sort(() => Math.random() - 0.5).slice(0, count);
 
-const getRandomDecimalNumber = (max, min) => ((Math.random() * (max - min)) + min).toFixed(1);
+let counterComment = 0;
+const getIntegerArray = Array.from({length: 100}, () => counterComment++);
 
 const getDuration = (minutes) => {
   const hours = minutes / 60;
@@ -34,9 +33,7 @@ const getDuration = (minutes) => {
 
 const getFilmYear = (date) => dayjs(date).get('year');
 
-const getFilmDate = (date) => dayjs(date).format('YYYY/MM/DD HH:MM');
-
-const getPublishDate = (date) => dayjs(date).format('DD MMMM YYYY');
+const humanizeDate = (date) => dayjs(date).format('YYYY/MM/DD HH:MM');
 
 const getRandomDay = (rangeType, min, max) => {
   const daysGap = getRandomInteger(max, min);
@@ -44,4 +41,4 @@ const getRandomDay = (rangeType, min, max) => {
   return dayjs().add(daysGap, rangeType).toDate();
 };
 
-export {getRandomInteger, getRandomArrayItem, getRandomizedReducedArray, getRandomDecimalNumber, getFilmYear, getDuration, getFilmDate, getPublishDate, getRandomDay };
+export {getRandomInteger, getRandomArrayItem, getRandomizedReducedArray, getFilmYear, getDuration, humanizeDate, getRandomDay, getIntegerArray };

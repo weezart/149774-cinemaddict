@@ -1,4 +1,4 @@
-import {getRandomArrayItem, getRandomizedReducedArray, getRandomInteger, getRandomDay} from '../utils.js';
+import {getRandomArrayItem, getRandomizedReducedArray, getRandomInteger, getRandomDay, getIntegerArray} from '../utils.js';
 
 export const FILM_NAMES = [
   'Made for Each Other',
@@ -92,32 +92,30 @@ export const COUNTRIES = [
 
 let counterFilm = 0;
 
-export const generateFilm = () => {
-  return {
-    id: counterFilm++,
-    comments: [0, 1, 2],
-    filmInfo: {
-      title: getRandomArrayItem(FILM_NAMES),
-      alternativeTitle: getRandomArrayItem(FILM_NAMES),
-      totalRating: getRandomInteger(10, 100) / 10,
-      poster: getRandomArrayItem(POSTERS),
-      ageRating: getRandomInteger(0, 18),
-      director: getRandomArrayItem(DIRECTOR_NAMES),
-      writers: getRandomizedReducedArray(WRITERS, getRandomInteger(1, 3)),
-      actors: getRandomizedReducedArray(ACTORS, getRandomInteger(1, 5)),
-      release: {
-        date: getRandomDay('year', -40, 0),
-        releaseCountry: getRandomArrayItem(COUNTRIES),
-      },
-      runtime: getRandomInteger(20, 180),
-      genre: getRandomizedReducedArray(GENRES, getRandomInteger(0, 3)),
-      description: getRandomizedReducedArray(DESCRIPTIONS, getRandomInteger(1, 5)).join(''),
+export const generateFilm = () => ({
+  id: counterFilm++,
+  comments: getRandomizedReducedArray(getIntegerArray, getRandomInteger(0, 5)),
+  filmInfo: {
+    title: getRandomArrayItem(FILM_NAMES),
+    alternativeTitle: getRandomArrayItem(FILM_NAMES),
+    totalRating: getRandomInteger(10, 100) / 10,
+    poster: getRandomArrayItem(POSTERS),
+    ageRating: getRandomInteger(0, 18),
+    director: getRandomArrayItem(DIRECTOR_NAMES),
+    writers: getRandomizedReducedArray(WRITERS, getRandomInteger(1, 3)),
+    actors: getRandomizedReducedArray(ACTORS, getRandomInteger(1, 5)),
+    release: {
+      date: getRandomDay('year', -40, 0),
+      releaseCountry: getRandomArrayItem(COUNTRIES),
     },
-    userDetails: {
-      watchlist: Boolean(getRandomInteger(0, 1)),
-      alreadyWatched: Boolean(getRandomInteger(0, 1)),
-      watchingDate: '2019-04-12T16:12:32.554Z',
-      favorite: Boolean(getRandomInteger(0, 1))
-    },
-  };
-};
+    runtime: getRandomInteger(20, 180),
+    genre: getRandomizedReducedArray(GENRES, getRandomInteger(0, 3)),
+    description: getRandomizedReducedArray(DESCRIPTIONS, getRandomInteger(1, 5)).join(''),
+  },
+  userDetails: {
+    watchlist: Boolean(getRandomInteger(0, 1)),
+    alreadyWatched: Boolean(getRandomInteger(0, 1)),
+    watchingDate: '2019-04-12T16:12:32.554Z',
+    favorite: Boolean(getRandomInteger(0, 1))
+  },
+});
