@@ -66,10 +66,13 @@ export default class FilmsPresenter {
     };
 
     const showFilmDetail = (comments) => {
-      document.body.classList.add('hide-overflow');
-      render(new FilmDetailView(film, comments),  footerElement, RenderPosition.AFTEREND);
+      const filmPopupComponent = new FilmDetailView(film, comments);
+
+      filmPopupComponent.element.querySelector('.film-details__close-btn').addEventListener('click', hideFilmDetail);
+
+      render(filmPopupComponent,  footerElement, RenderPosition.AFTEREND);
       document.body.addEventListener('keydown', onDocumentEscKeydown);
-      document.querySelector('.film-details__close-btn').addEventListener('click', hideFilmDetail);
+      document.body.classList.add('hide-overflow');
     };
 
     function hideFilmDetail () {
@@ -80,6 +83,11 @@ export default class FilmsPresenter {
 
     filmCardComponent.element.addEventListener('click', () => {
       const filmComments = this.#comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
+
+      if (document.body.classList.contains('hide-overflow')) {
+        hideFilmDetail();
+      }
+
       showFilmDetail(filmComments);
     });
 
