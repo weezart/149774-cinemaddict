@@ -142,7 +142,7 @@ export default class FilmDetailView extends View {
     this.comments = comments;
   }
 
-  getTemplate() {
+  get template() {
     return createFilmDetailTemplate(this.film, this.comments);
   }
 }

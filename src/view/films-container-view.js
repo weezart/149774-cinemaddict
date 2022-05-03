@@ -10,7 +10,7 @@ export default class FilmsContainer extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createFilmsContainerTemplate();
   }
 }

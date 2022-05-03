@@ -33,47 +33,52 @@ function hideFilmDetail () {
 }
 
 export default class FilmsPresenter {
-  filmsComponent = new FilmsView();
-  filmsListComponent = new FilmsListView();
-  filmsListTopRatedComponent = new FilmsListTopRatedView();
-  filmsListMostCommentedComponent = new FilmsListMostCommentedView();
-  filmsContainerComponent = new FilmsContainer();
-  filmsContainerTopRatedComponent = new FilmsContainer();
-  filmsContainerMostCommentedComponent = new FilmsContainer();
+  #filmsContainer = null;
+  #filmsModel = null;
+  #filmsList = [];
+  #comments = [];
+
+  #filmsComponent = new FilmsView();
+  #filmsListComponent = new FilmsListView();
+  #filmsListTopRatedComponent = new FilmsListTopRatedView();
+  #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
+  #filmsContainerComponent = new FilmsContainer();
+  #filmsContainerTopRatedComponent = new FilmsContainer();
+  #filmsContainerMostCommentedComponent = new FilmsContainer();
 
   init = (filmsContainer, filmsModel) => {
-    this.filmsContainer = filmsContainer;
-    this.filmsModel = filmsModel;
-    this.filmsList = [...this.filmsModel.getFilms()];
-    this.comments = [...this.filmsModel.getComments()];
+    this.#filmsContainer = filmsContainer;
+    this.#filmsModel = filmsModel;
+    this.#filmsList = [...this.#filmsModel.films];
+    this.#comments = [...this.#filmsModel.comments];
 
-    render(this.filmsComponent, this.filmsContainer);
-    render(this.filmsListComponent, this.filmsComponent.getElement());
-    render(this.filmsContainerComponent, this.filmsListComponent.getElement());
+    render(this.#filmsComponent, this.#filmsContainer);
+    render(this.#filmsListComponent, this.#filmsComponent.element);
+    render(this.#filmsContainerComponent, this.#filmsListComponent.element);
 
-    for (let i = 0; i < this.filmsList.length; i++) {
-      render(new FilmCardView(this.filmsList[i]), this.filmsContainerComponent.getElement());
+    for (let i = 0; i < this.#filmsList.length; i++) {
+      render(new FilmCardView(this.#filmsList[i]), this.#filmsContainerComponent.element);
     }
 
-    render(this.filmsListTopRatedComponent, this.filmsComponent.getElement());
-    render(this.filmsListMostCommentedComponent, this.filmsComponent.getElement());
+    render(this.#filmsListTopRatedComponent, this.#filmsComponent.element);
+    render(this.#filmsListMostCommentedComponent, this.#filmsComponent.element);
 
-    render(this.filmsContainerTopRatedComponent, this.filmsListTopRatedComponent.getElement());
-    render(this.filmsContainerMostCommentedComponent, this.filmsListMostCommentedComponent.getElement());
+    render(this.#filmsContainerTopRatedComponent, this.#filmsListTopRatedComponent.element);
+    render(this.#filmsContainerMostCommentedComponent, this.#filmsListMostCommentedComponent.element);
 
     for (let i = 0; i < 2; i++) {
-      render(new FilmCardView(this.filmsList[i]), this.filmsContainerTopRatedComponent.getElement());
-      render(new FilmCardView(this.filmsList[i]), this.filmsContainerMostCommentedComponent.getElement());
+      render(new FilmCardView(this.#filmsList[i]), this.#filmsContainerTopRatedComponent.element);
+      render(new FilmCardView(this.#filmsList[i]), this.#filmsContainerMostCommentedComponent.element);
     }
 
     const filmCards = document.querySelectorAll('.film-card');
 
     filmCards.forEach((card) => card.addEventListener('click', () => {
-      const currentFilm = this.filmsList.find((film) => film.id === Number(card.dataset.id));
-      const filmComments = this.comments.filter(({id}) => currentFilm.comments.some((commentId) => commentId === Number(id)));
+      const currentFilm = this.#filmsList.find((film) => film.id === Number(card.dataset.id));
+      const filmComments = this.#comments.filter(({id}) => currentFilm.comments.some((commentId) => commentId === Number(id)));
       showFilmDetail(currentFilm, filmComments);
     }));
 
-    render(new LoadMoreButtonView(), this.filmsListComponent.getElement());
+    render(new LoadMoreButtonView(), this.#filmsListComponent.element);
   };
 }

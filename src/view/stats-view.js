@@ -11,7 +11,7 @@ export default class StatsView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createStatsTemplate();
   }
 }

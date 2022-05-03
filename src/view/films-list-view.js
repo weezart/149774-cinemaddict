@@ -12,7 +12,7 @@ export default class FilmsListView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createFilmsListTemplate();
   }
 }

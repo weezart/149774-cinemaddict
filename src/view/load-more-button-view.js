@@ -11,7 +11,7 @@ export default class LoadMoreButtonView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createLoadMoreButtonTemplate();
   }
 }

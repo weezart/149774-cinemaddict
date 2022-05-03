@@ -12,7 +12,7 @@ export default class FilmsListTopRatedView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createFilmsListTopRatedTemplate();
   }
 }
