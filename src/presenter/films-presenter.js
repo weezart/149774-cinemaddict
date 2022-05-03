@@ -8,30 +8,6 @@ import LoadMoreButtonView from '../view/load-more-button-view.js';
 import FilmDetailView from '../view/film-detail-view';
 import {render, RenderPosition} from '../render.js';
 
-const footerElement = document.querySelector('.footer');
-
-const isPressedEscapeKey = (evt) => evt.key === 'Escape';
-
-const onDocumentEscKeydown = (evt) => {
-  if (isPressedEscapeKey(evt)) {
-    evt.preventDefault();
-    hideFilmDetail();
-  }
-};
-
-const showFilmDetail = (film, comments) => {
-  document.body.classList.add('hide-overflow');
-  render(new FilmDetailView(film, comments),  footerElement, RenderPosition.AFTEREND);
-  document.body.addEventListener('keydown', onDocumentEscKeydown);
-  document.querySelector('.film-details__close-btn').addEventListener('click', hideFilmDetail);
-};
-
-function hideFilmDetail () {
-  document.body.classList.remove('hide-overflow');
-  document.body.removeEventListener('keydown', onDocumentEscKeydown);
-  document.querySelector('.film-details').remove();
-}
-
 export default class FilmsPresenter {
   #filmsContainer = null;
   #filmsModel = null;
@@ -52,29 +28,21 @@ export default class FilmsPresenter {
     this.#filmsList = [...this.#filmsModel.films];
     this.#comments = [...this.#filmsModel.comments];
 
-    this.#renderFilmsComponts();
+    this.#renderFilmsComponents();
 
     for (let i = 0; i < this.#filmsList.length; i++) {
-      this.#renderFilmCard(this.#filmsList[i]);
+      this.#renderFilm(this.#filmsList[i], this.#filmsContainerComponent.element);
     }
 
     for (let i = 0; i < 2; i++) {
-      this.#renderMostCommentedFilmCard(this.#filmsList[i]);
-      this.#renderTopRatedFilmCard(this.#filmsList[i]);
+      this.#renderFilm(this.#filmsList[i], this.#filmsContainerMostCommentedComponent.element);
+      this.#renderFilm(this.#filmsList[i], this.#filmsContainerTopRatedComponent.element);
     }
-
-    const filmCards = document.querySelectorAll('.film-card');
-
-    filmCards.forEach((card) => card.addEventListener('click', () => {
-      const currentFilm = this.#filmsList.find((film) => film.id === Number(card.dataset.id));
-      const filmComments = this.#comments.filter(({id}) => currentFilm.comments.some((commentId) => commentId === Number(id)));
-      showFilmDetail(currentFilm, filmComments);
-    }));
 
     render(new LoadMoreButtonView(), this.#filmsListComponent.element);
   };
 
-  #renderFilmsComponts = () => {
+  #renderFilmsComponents = () => {
     render(this.#filmsComponent, this.#filmsContainer);
     render(this.#filmsListComponent, this.#filmsComponent.element);
     render(this.#filmsContainerComponent, this.#filmsListComponent.element);
@@ -84,21 +52,37 @@ export default class FilmsPresenter {
     render(this.#filmsContainerMostCommentedComponent, this.#filmsListMostCommentedComponent.element);
   };
 
-  #renderFilmCard = (film) => {
+  #renderFilm = (film, container) => {
     const filmCardComponent = new FilmCardView(film);
 
-    render(filmCardComponent, this.#filmsContainerComponent.element);
-  };
+    const footerElement = document.querySelector('.footer');
+    const isPressedEscapeKey = (evt) => evt.key === 'Escape';
 
-  #renderMostCommentedFilmCard = (film) => {
-    const filmCardComponent = new FilmCardView(film);
+    const onDocumentEscKeydown = (evt) => {
+      if (isPressedEscapeKey(evt)) {
+        evt.preventDefault();
+        hideFilmDetail();
+      }
+    };
 
-    render(filmCardComponent, this.#filmsContainerMostCommentedComponent.element);
-  };
+    const showFilmDetail = (comments) => {
+      document.body.classList.add('hide-overflow');
+      render(new FilmDetailView(film, comments),  footerElement, RenderPosition.AFTEREND);
+      document.body.addEventListener('keydown', onDocumentEscKeydown);
+      document.querySelector('.film-details__close-btn').addEventListener('click', hideFilmDetail);
+    };
 
-  #renderTopRatedFilmCard = (film) => {
-    const filmCardComponent = new FilmCardView(film);
+    function hideFilmDetail () {
+      document.body.classList.remove('hide-overflow');
+      document.body.removeEventListener('keydown', onDocumentEscKeydown);
+      document.querySelector('.film-details').remove();
+    }
 
-    render(filmCardComponent, this.#filmsContainerTopRatedComponent.element);
+    filmCardComponent.element.addEventListener('click', () => {
+      const filmComments = this.#comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
+      showFilmDetail(filmComments);
+    });
+
+    render(filmCardComponent, container);
   };
 }
