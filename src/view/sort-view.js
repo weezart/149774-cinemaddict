@@ -13,7 +13,7 @@ export default class SortView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createSortTemplate();
   }
 }

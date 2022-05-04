@@ -14,7 +14,7 @@ export default class MenuView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createMenuTemplate();
   }
 }

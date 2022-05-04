@@ -7,73 +7,90 @@ import FilmCardView from '../view/film-card-view.js';
 import LoadMoreButtonView from '../view/load-more-button-view.js';
 import FilmDetailView from '../view/film-detail-view';
 import {render, RenderPosition} from '../render.js';
-
-const footerElement = document.querySelector('.footer');
-
-const isPressedEscapeKey = (evt) => evt.key === 'Escape';
-
-const onDocumentEscKeydown = (evt) => {
-  if (isPressedEscapeKey(evt)) {
-    evt.preventDefault();
-    hideFilmDetail();
-  }
-};
-
-const showFilmDetail = (film, comments) => {
-  document.body.classList.add('hide-overflow');
-  render(new FilmDetailView(film, comments),  footerElement, RenderPosition.AFTEREND);
-  document.body.addEventListener('keydown', onDocumentEscKeydown);
-  document.querySelector('.film-details__close-btn').addEventListener('click', hideFilmDetail);
-};
-
-function hideFilmDetail () {
-  document.body.classList.remove('hide-overflow');
-  document.body.removeEventListener('keydown', onDocumentEscKeydown);
-  document.querySelector('.film-details').remove();
-}
+import {IS_PRESSED_ESCAPE_KEY} from '../const.js';
 
 export default class FilmsPresenter {
-  filmsComponent = new FilmsView();
-  filmsListComponent = new FilmsListView();
-  filmsListTopRatedComponent = new FilmsListTopRatedView();
-  filmsListMostCommentedComponent = new FilmsListMostCommentedView();
-  filmsContainerComponent = new FilmsContainer();
-  filmsContainerTopRatedComponent = new FilmsContainer();
-  filmsContainerMostCommentedComponent = new FilmsContainer();
+  #filmsContainer = null;
+  #filmsModel = null;
+  #filmsList = [];
+  #comments = [];
+
+  #filmsComponent = new FilmsView();
+  #filmsListComponent = new FilmsListView();
+  #filmsListTopRatedComponent = new FilmsListTopRatedView();
+  #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
+  #filmsContainerComponent = new FilmsContainer();
+  #filmsContainerTopRatedComponent = new FilmsContainer();
+  #filmsContainerMostCommentedComponent = new FilmsContainer();
 
   init = (filmsContainer, filmsModel) => {
-    this.filmsContainer = filmsContainer;
-    this.filmsModel = filmsModel;
-    this.filmsList = [...this.filmsModel.getFilms()];
-    this.comments = [...this.filmsModel.getComments()];
+    this.#filmsContainer = filmsContainer;
+    this.#filmsModel = filmsModel;
+    this.#filmsList = [...this.#filmsModel.films];
+    this.#comments = [...this.#filmsModel.comments];
 
-    render(this.filmsComponent, this.filmsContainer);
-    render(this.filmsListComponent, this.filmsComponent.getElement());
-    render(this.filmsContainerComponent, this.filmsListComponent.getElement());
+    this.#renderFilmsComponents();
 
-    for (let i = 0; i < this.filmsList.length; i++) {
-      render(new FilmCardView(this.filmsList[i]), this.filmsContainerComponent.getElement());
+    for (let i = 0; i < this.#filmsList.length; i++) {
+      this.#renderFilm(this.#filmsList[i], this.#filmsContainerComponent.element);
     }
-
-    render(this.filmsListTopRatedComponent, this.filmsComponent.getElement());
-    render(this.filmsListMostCommentedComponent, this.filmsComponent.getElement());
-
-    render(this.filmsContainerTopRatedComponent, this.filmsListTopRatedComponent.getElement());
-    render(this.filmsContainerMostCommentedComponent, this.filmsListMostCommentedComponent.getElement());
 
     for (let i = 0; i < 2; i++) {
-      render(new FilmCardView(this.filmsList[i]), this.filmsContainerTopRatedComponent.getElement());
-      render(new FilmCardView(this.filmsList[i]), this.filmsContainerMostCommentedComponent.getElement());
+      this.#renderFilm(this.#filmsList[i], this.#filmsContainerMostCommentedComponent.element);
+      this.#renderFilm(this.#filmsList[i], this.#filmsContainerTopRatedComponent.element);
     }
 
-    const filmCards = document.querySelectorAll('.film-card');
+    render(new LoadMoreButtonView(), this.#filmsListComponent.element);
+  };
 
-    filmCards.forEach((card) => card.addEventListener('click', () => {
-      const currentFilm = this.filmsList.find((film) => film.id === Number(card.dataset.id));
-      const filmComments = this.comments.filter(({id}) => currentFilm.comments.some((commentId) => commentId === Number(id)));
-      showFilmDetail(currentFilm, filmComments);
-    }));
+  #renderFilmsComponents = () => {
+    render(this.#filmsComponent, this.#filmsContainer);
+    render(this.#filmsListComponent, this.#filmsComponent.element);
+    render(this.#filmsContainerComponent, this.#filmsListComponent.element);
+    render(this.#filmsListTopRatedComponent, this.#filmsComponent.element);
+    render(this.#filmsListMostCommentedComponent, this.#filmsComponent.element);
+    render(this.#filmsContainerTopRatedComponent, this.#filmsListTopRatedComponent.element);
+    render(this.#filmsContainerMostCommentedComponent, this.#filmsListMostCommentedComponent.element);
+  };
 
-    render(new LoadMoreButtonView(), this.filmsListComponent.getElement());
+  #renderFilm = (film, container) => {
+    const filmCardComponent = new FilmCardView(film);
+
+    const footerElement = document.querySelector('.footer');
+
+    const onDocumentEscKeydown = (evt) => {
+      if (IS_PRESSED_ESCAPE_KEY(evt)) {
+        evt.preventDefault();
+        hideFilmDetail();
+      }
+    };
+
+    const showFilmDetail = (comments) => {
+      const filmPopupComponent = new FilmDetailView(film, comments);
+
+      filmPopupComponent.element.querySelector('.film-details__close-btn').addEventListener('click', hideFilmDetail);
+
+      render(filmPopupComponent,  footerElement, RenderPosition.AFTEREND);
+      document.body.addEventListener('keydown', onDocumentEscKeydown);
+      document.body.classList.add('hide-overflow');
+    };
+
+    function hideFilmDetail () {
+      document.body.classList.remove('hide-overflow');
+      document.body.removeEventListener('keydown', onDocumentEscKeydown);
+      document.querySelector('.film-details').remove();
+    }
+
+    filmCardComponent.element.addEventListener('click', () => {
+      const filmComments = this.#comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
+
+      if (document.body.classList.contains('hide-overflow')) {
+        hideFilmDetail();
+      }
+
+      showFilmDetail(filmComments);
+    });
+
+    render(filmCardComponent, container);
   };
 }

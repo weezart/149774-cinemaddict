@@ -12,7 +12,7 @@ export default class FilmsListMostCommentedView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createFilmsListMostCommentedTemplate();
   }
 }

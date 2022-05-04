@@ -12,7 +12,7 @@ export default class ProfileView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createProfileTemplate();
   }
 }
