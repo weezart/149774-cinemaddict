@@ -7,6 +7,7 @@ import FilmCardView from '../view/film-card-view.js';
 import LoadMoreButtonView from '../view/load-more-button-view.js';
 import FilmDetailView from '../view/film-detail-view';
 import {render, RenderPosition} from '../render.js';
+import {IS_PRESSED_ESCAPE_KEY} from '../const.js';
 
 export default class FilmsPresenter {
   #filmsContainer = null;
@@ -56,10 +57,9 @@ export default class FilmsPresenter {
     const filmCardComponent = new FilmCardView(film);
 
     const footerElement = document.querySelector('.footer');
-    const isPressedEscapeKey = (evt) => evt.key === 'Escape';
 
     const onDocumentEscKeydown = (evt) => {
-      if (isPressedEscapeKey(evt)) {
+      if (IS_PRESSED_ESCAPE_KEY(evt)) {
         evt.preventDefault();
         hideFilmDetail();
       }
