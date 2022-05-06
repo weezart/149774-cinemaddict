@@ -8,7 +8,7 @@ import LoadMoreButtonView from '../view/load-more-button-view.js';
 import FilmDetailView from '../view/film-detail-view';
 import NoFilmsView from '../view/no-films-view';
 import {render, RenderPosition} from '../render.js';
-import {IS_PRESSED_ESCAPE_KEY, FILM_COUNT_PER_STEP} from '../const.js';
+import {IS_PRESSED_ESCAPE_KEY, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
 
 export default class FilmsPresenter {
   #filmsContainer = null;
@@ -108,11 +108,13 @@ export default class FilmsPresenter {
     if (this.#filmsList.length > 0) {
       this.#renderFilmsComponents();
 
-      for (let i = 0; i < Math.min(this.#filmsList.length, FILM_COUNT_PER_STEP); i++) {
+      const FILMS_COUNT_ON_START = Math.min(this.#filmsList.length, FILM_COUNT_PER_STEP);
+
+      for (let i = 0; i < FILMS_COUNT_ON_START; i++) {
         this.#renderFilm(this.#filmsList[i], this.#filmsContainerComponent.element);
       }
 
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < EXTRA_FILM_COUNT; i++) {
         this.#renderFilm(this.#filmsList[i], this.#filmsContainerMostCommentedComponent.element);
         this.#renderFilm(this.#filmsList[i], this.#filmsContainerTopRatedComponent.element);
       }
