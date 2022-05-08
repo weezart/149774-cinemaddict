@@ -2,7 +2,7 @@ import View from './view';
 
 const createFilmsListTopRatedTemplate = () => (
   `<section class="films-list--extra">
-      <h2 class="films-list__title">Most commented</h2>
+      <h2 class="films-list__title">Top rated</h2>
     </section>
   `
 );

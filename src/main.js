@@ -11,11 +11,11 @@ const siteHeaderElement = document.querySelector('.header');
 
 const footerStatsElement = document.querySelector('.footer__statistics');
 const filmsModel = new FilmsModel();
-const filmsPresenter = new FilmsPresenter();
+const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel);
 
 render(new ProfileView(), siteHeaderElement);
 render(new StatsView(), footerStatsElement);
 render(new MenuView(), siteMainElement);
 render(new SortView(), siteMainElement);
 
-filmsPresenter.init(siteMainElement, filmsModel);
+filmsPresenter.init();
