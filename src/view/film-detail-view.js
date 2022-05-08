@@ -1,4 +1,4 @@
-import View from './view';
+import AbstractView from '../framework/view/abstract-view.js';
 import {COMMENT_EMOTIONS} from '../const.js';
 import {getDuration, humanizeDate} from '../utils.js';
 
@@ -134,7 +134,7 @@ const createFilmDetailTemplate = (film, commentsList) => {
   );
 };
 
-export default class FilmDetailView extends View {
+export default class FilmDetailView extends AbstractView {
   constructor(film, comments) {
     super();
 

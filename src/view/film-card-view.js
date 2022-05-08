@@ -1,4 +1,5 @@
-import View from './view';
+import AbstractView from '../framework/view/abstract-view.js';
+
 import { getDuration, getFilmYear} from '../utils.js';
 
 const createFilmCardTemplate = (film) => {
@@ -37,7 +38,7 @@ const createFilmCardTemplate = (film) => {
   );
 };
 
-export default class FilmCardView extends View {
+export default class FilmCardView extends AbstractView {
   constructor(film) {
     super();
     this.film = film;

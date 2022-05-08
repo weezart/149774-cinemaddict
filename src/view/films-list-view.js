@@ -1,4 +1,4 @@
-import View from './view';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createFilmsListTemplate = () => (
   `<section class="films-list">
@@ -7,7 +7,7 @@ const createFilmsListTemplate = () => (
   `
 );
 
-export default class FilmsListView extends View {
+export default class FilmsListView extends AbstractView {
   constructor() {
     super();
   }

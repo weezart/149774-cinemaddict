@@ -7,7 +7,7 @@ import FilmCardView from '../view/film-card-view.js';
 import LoadMoreButtonView from '../view/load-more-button-view.js';
 import FilmDetailView from '../view/film-detail-view';
 import NoFilmsView from '../view/no-films-view';
-import {render, RenderPosition} from '../render.js';
+import {render, RenderPosition} from '../framework/render.js';
 import {IS_PRESSED_ESCAPE_KEY, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
 
 export default class FilmsPresenter {

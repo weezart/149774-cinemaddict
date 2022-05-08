@@ -1,4 +1,4 @@
-import View from './view';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createFilmsListMostCommentedTemplate = () => (
   `<section class="films-list--extra">
@@ -7,7 +7,7 @@ const createFilmsListMostCommentedTemplate = () => (
   `
 );
 
-export default class FilmsListMostCommentedView extends View {
+export default class FilmsListMostCommentedView extends AbstractView {
   constructor() {
     super();
   }
