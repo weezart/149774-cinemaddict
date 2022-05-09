@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-import { getDuration, getFilmYear} from '../utils.js';
+import { getDuration, getFilmYear} from '../utils/film.js';
 
 const createFilmCardTemplate = (film) => {
   const { id, comments, filmInfo, userDetails } = film;
@@ -47,4 +47,14 @@ export default class FilmCardView extends AbstractView {
   get template() {
     return createFilmCardTemplate(this.film);
   }
+
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.addEventListener('click', this.#clickHandler);
+  };
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }
