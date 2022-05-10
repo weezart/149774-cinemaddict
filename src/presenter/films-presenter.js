@@ -7,7 +7,7 @@ import FilmCardView from '../view/film-card-view.js';
 import LoadMoreButtonView from '../view/load-more-button-view.js';
 import FilmDetailView from '../view/film-detail-view';
 import NoFilmsView from '../view/no-films-view';
-import {render, RenderPosition} from '../render.js';
+import {render, remove, RenderPosition} from '../framework/render.js';
 import {IS_PRESSED_ESCAPE_KEY, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
 
 export default class FilmsPresenter {
@@ -38,8 +38,7 @@ export default class FilmsPresenter {
     this.#renderFilms();
   };
 
-  #handleLoadMoreButtonClick = (evt) => {
-    evt.preventDefault();
+  #handleLoadMoreButtonClick = () => {
     this.#filmsList
       .slice(this.#renderedFilmCount, this.#renderedFilmCount + FILM_COUNT_PER_STEP)
       .forEach((film) => this.#renderFilm(film, this.#filmsContainerComponent.element));
@@ -47,8 +46,7 @@ export default class FilmsPresenter {
     this.#renderedFilmCount += FILM_COUNT_PER_STEP;
 
     if (this.#renderedFilmCount >= this.#filmsList.length) {
-      this.#loadMoreButtonComponent.element.remove();
-      this.#loadMoreButtonComponent.removeElement();
+      remove(this.#loadMoreButtonComponent);
     }
   };
 
@@ -76,7 +74,7 @@ export default class FilmsPresenter {
     const showFilmDetail = (comments) => {
       const filmPopupComponent = new FilmDetailView(film, comments);
 
-      filmPopupComponent.element.querySelector('.film-details__close-btn').addEventListener('click', hideFilmDetail);
+      filmPopupComponent.setClickHandler(hideFilmDetail);
 
       render(filmPopupComponent, footerElement, RenderPosition.AFTEREND);
       document.body.addEventListener('keydown', onDocumentEscKeydown);
@@ -89,7 +87,7 @@ export default class FilmsPresenter {
       document.querySelector('.film-details').remove();
     }
 
-    filmCardComponent.element.addEventListener('click', () => {
+    filmCardComponent.setClickHandler(() => {
       const filmComments = this.#comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
 
       if (document.body.classList.contains('hide-overflow')) {
@@ -122,7 +120,7 @@ export default class FilmsPresenter {
       if (this.#filmsList.length > FILM_COUNT_PER_STEP) {
         render(this.#loadMoreButtonComponent, this.#filmsListComponent.element);
 
-        this.#loadMoreButtonComponent.element.addEventListener('click', this.#handleLoadMoreButtonClick);
+        this.#loadMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
       }
     } else {
       render(new NoFilmsView(), this.#filmsComponent.element);

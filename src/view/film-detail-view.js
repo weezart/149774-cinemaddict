@@ -1,6 +1,6 @@
-import View from './view';
+import AbstractView from '../framework/view/abstract-view.js';
 import {COMMENT_EMOTIONS} from '../const.js';
-import {getDuration, humanizeDate} from '../utils.js';
+import {getDuration, humanizeDate} from '../utils/film.js';
 
 const createFilmDetailTemplate = (film, commentsList) => {
   const { id, comments, filmInfo, userDetails } = film;
@@ -134,7 +134,7 @@ const createFilmDetailTemplate = (film, commentsList) => {
   );
 };
 
-export default class FilmDetailView extends View {
+export default class FilmDetailView extends AbstractView {
   constructor(film, comments) {
     super();
 
@@ -145,4 +145,14 @@ export default class FilmDetailView extends View {
   get template() {
     return createFilmDetailTemplate(this.film, this.comments);
   }
+
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
+  };
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }

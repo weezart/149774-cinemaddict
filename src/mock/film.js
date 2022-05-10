@@ -1,4 +1,5 @@
-import {getRandomArrayItem, getRandomizedReducedArray, getRandomInteger, getRandomDay, getIntegerArray} from '../utils.js';
+import {getRandomArrayItem, getRandomizedReducedArray, getRandomInteger} from '../utils/common.js';
+import {getIntegerArray, getRandomDay} from '../utils/film.js';
 
 export const FILM_NAMES = [
   'Made for Each Other',

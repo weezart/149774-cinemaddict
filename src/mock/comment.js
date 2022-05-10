@@ -1,4 +1,5 @@
-import {getRandomArrayItem, getRandomDay} from '../utils.js';
+import {getRandomArrayItem} from '../utils/common.js';
+import {getRandomDay} from '../utils/film.js';
 import {COMMENT_EMOTIONS} from '../const.js';
 
 const COMMENTS = [

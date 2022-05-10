@@ -1,4 +1,4 @@
-import View from './view';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createStatsTemplate = () => (
   `<section class="footer__statistics">
@@ -6,7 +6,7 @@ const createStatsTemplate = () => (
   </section>`
 );
 
-export default class StatsView extends View {
+export default class StatsView extends AbstractView {
   constructor() {
     super();
   }

@@ -1,4 +1,4 @@
-import View from './view';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createProfileTemplate = () => (
   `<section class="header__profile profile">
@@ -7,7 +7,7 @@ const createProfileTemplate = () => (
   </section>`
 );
 
-export default class ProfileView extends View {
+export default class ProfileView extends AbstractView {
   constructor() {
     super();
   }
