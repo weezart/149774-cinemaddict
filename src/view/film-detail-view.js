@@ -169,16 +169,19 @@ export default class FilmDetailView extends AbstractView {
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.watchlistClick();
+    this.element.querySelector('.film-details__control-button--watchlist').classList.toggle('film-details__control-button--active');
   };
 
   #watchedClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.watchedClick();
+    this.element.querySelector('.film-details__control-button--watched').classList.toggle('film-details__control-button--active');
   };
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
+    this.element.querySelector('.film-details__control-button--favorite').classList.toggle('film-details__control-button--active');
   };
 
   #clickHandler = (evt) => {

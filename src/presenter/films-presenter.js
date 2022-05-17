@@ -16,8 +16,12 @@ export default class FilmsPresenter {
   #filmsModel = null;
   #filmsList = [];
   #comments = [];
+  #topRatedFilms = [];
+  #mostCommentedFilms = [];
   #renderedFilmCount = FILM_COUNT_PER_STEP;
   #filmPresenter = new Map();
+  #topRatedPresenter = new Map();
+  #mostCommentedPresenter = new Map();
 
   #filmsComponent = new FilmsView();
   #filmsListComponent = new FilmsListView();
@@ -37,6 +41,8 @@ export default class FilmsPresenter {
   init = () => {
     this.#filmsList = [...this.#filmsModel.films];
     this.#comments = [...this.#filmsModel.comments];
+    this.#topRatedFilms = this.#filmsList.slice(0, EXTRA_FILM_COUNT);
+    this.#mostCommentedFilms = this.#filmsList.slice(0, EXTRA_FILM_COUNT);
 
     this.#renderBoard();
   };
@@ -44,7 +50,7 @@ export default class FilmsPresenter {
   #handleLoadMoreButtonClick = () => {
     this.#filmsList
       .slice(this.#renderedFilmCount, this.#renderedFilmCount + FILM_COUNT_PER_STEP)
-      .forEach((film) => this.#renderFilm(film, this.#filmsContainerComponent.element));
+      .forEach((film) => this.#renderFilm(film, this.#filmsContainerComponent.element, this.#filmPresenter));
 
     this.#renderedFilmCount += FILM_COUNT_PER_STEP;
 
@@ -55,33 +61,47 @@ export default class FilmsPresenter {
 
   #handleFilmChange = (updatedFilm) => {
     this.#filmsList = updateItem(this.#filmsList, updatedFilm);
+    this.#topRatedFilms = updateItem(this.#topRatedFilms, updatedFilm);
+    this.#mostCommentedFilms = updateItem(this.#mostCommentedFilms, updatedFilm);
+
     this.#filmPresenter.get(updatedFilm.id).init(updatedFilm, this.#comments);
+
+    if (this.#topRatedPresenter.get(updatedFilm.id)) {
+      this.#topRatedPresenter.get(updatedFilm.id).init(updatedFilm, this.#comments);
+    }
+
+    if (this.#mostCommentedPresenter.get(updatedFilm.id)) {
+      this.#mostCommentedPresenter.get(updatedFilm.id).init(updatedFilm, this.#comments);
+    }
   };
 
-  #renderFilm = (film, container, isMainFilmList) => {
+  #renderFilm = (film, container, presenter) => {
     const filmPresenter = new FilmPresenter(container, this.#handleFilmChange);
 
     filmPresenter.init(film, this.#comments);
 
-    if (isMainFilmList) {
+    if(presenter === this.#filmPresenter) {
       this.#filmPresenter.set(film.id, filmPresenter);
+    } else if (presenter === this.#topRatedPresenter) {
+      this.#topRatedPresenter.set(film.id, filmPresenter);
+    } else if (presenter === this.#mostCommentedPresenter) {
+      this.#mostCommentedPresenter.set(film.id, filmPresenter);
     }
   };
 
-  #renderFilms = (from, to, container, isMainFilmList = false) => {
+  #renderFilms = (from, to, container, presenter) => {
     this.#filmsList
       .slice(from, to)
-      .forEach((film) => this.#renderFilm(film, container, isMainFilmList));
+      .forEach((film) => this.#renderFilm(film, container, presenter));
   };
 
   #renderFilmList = () => {
     render(this.#filmsListComponent, this.#filmsComponent.element);
     render(this.#filmsContainerComponent, this.#filmsListComponent.element);
 
-    const IS_MAIN_FILM_LIST = true;
     const FILMS_COUNT_ON_START = Math.min(this.#filmsList.length, FILM_COUNT_PER_STEP);
 
-    this.#renderFilms(0, FILMS_COUNT_ON_START, this.#filmsContainerComponent.element, IS_MAIN_FILM_LIST);
+    this.#renderFilms(0, FILMS_COUNT_ON_START, this.#filmsContainerComponent.element, this.#filmPresenter);
 
     if (this.#filmsList.length > FILM_COUNT_PER_STEP) {
       this.#renderLoadMoreButton();
@@ -99,14 +119,14 @@ export default class FilmsPresenter {
     render(this.#filmsListMostCommentedComponent, this.#filmsComponent.element);
     render(this.#filmsContainerMostCommentedComponent, this.#filmsListMostCommentedComponent.element);
 
-    this.#renderFilms(0, EXTRA_FILM_COUNT, this.#filmsContainerMostCommentedComponent.element);
+    this.#mostCommentedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerMostCommentedComponent.element, this.#mostCommentedPresenter));
   };
 
   #renderTopRatedList = () => {
     render(this.#filmsListTopRatedComponent, this.#filmsComponent.element);
     render(this.#filmsContainerTopRatedComponent, this.#filmsListTopRatedComponent.element);
 
-    this.#renderFilms(0, EXTRA_FILM_COUNT, this.#filmsContainerTopRatedComponent.element);
+    this.#topRatedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerTopRatedComponent.element, this.#topRatedPresenter));
   };
 
   #renderNoFilms = () => {

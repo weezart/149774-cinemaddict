@@ -67,7 +67,9 @@ export default class FilmPresenter {
   #hideFilmDetail = () => {
     document.body.classList.remove('hide-overflow');
     document.body.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#filmPopup.element.remove();
+    if (document.querySelector('.film-details')) {
+      document.querySelector('.film-details').remove();
+    }
   };
 
   #escKeyDownHandler = (evt) => {
