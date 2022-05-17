@@ -1,5 +1,6 @@
 import {getRandomArrayItem, getRandomizedReducedArray, getRandomInteger} from '../utils/common.js';
 import {getIntegerArray, getRandomDay} from '../utils/film.js';
+import {nanoid} from 'nanoid';
 
 export const FILM_NAMES = [
   'Made for Each Other',
@@ -91,10 +92,8 @@ export const COUNTRIES = [
   'UK'
 ];
 
-let counterFilm = 0;
-
 export const generateFilm = () => ({
-  id: counterFilm++,
+  id: nanoid(),
   comments: getRandomizedReducedArray(getIntegerArray, getRandomInteger(0, 5)),
   filmInfo: {
     title: getRandomArrayItem(FILM_NAMES),
