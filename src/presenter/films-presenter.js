@@ -1,6 +1,6 @@
 import {render, remove} from '../framework/render.js';
 import {FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
-import {updateItem} from '../utils/common.js';
+import {updateFilm} from '../utils/film.js';
 import FilmsView from '../view/films-view.js';
 import FilmsListView from '../view/films-list-view.js';
 import FilmsListTopRatedView from '../view/films-list-top-rated-view.js';
@@ -60,9 +60,9 @@ export default class FilmsPresenter {
   };
 
   #handleFilmChange = (updatedFilm) => {
-    this.#filmsList = updateItem(this.#filmsList, updatedFilm);
-    this.#topRatedFilms = updateItem(this.#topRatedFilms, updatedFilm);
-    this.#mostCommentedFilms = updateItem(this.#mostCommentedFilms, updatedFilm);
+    this.#filmsList = updateFilm(this.#filmsList, updatedFilm);
+    this.#topRatedFilms = updateFilm(this.#topRatedFilms, updatedFilm);
+    this.#mostCommentedFilms = updateFilm(this.#mostCommentedFilms, updatedFilm);
 
     this.#filmPresenter.get(updatedFilm.id).init(updatedFilm, this.#comments);
 

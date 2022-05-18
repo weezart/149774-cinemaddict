@@ -16,18 +16,5 @@ const getRandomArrayItem = (array) => {
 // Массив заданной длины случайных элементов.
 const getRandomizedReducedArray = (array, count) => array.slice().sort(() => Math.random() - 0.5).slice(0, count);
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
 
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
-};
-
-export {getRandomInteger, getRandomArrayItem, getRandomizedReducedArray, updateItem};
+export {getRandomInteger, getRandomArrayItem, getRandomizedReducedArray};
