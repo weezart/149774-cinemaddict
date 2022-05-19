@@ -24,4 +24,18 @@ const getRandomDay = (rangeType, min, max) => {
   return dayjs().add(daysGap, rangeType).toDate();
 };
 
-export {getFilmYear, getDuration, humanizeDate, getRandomDay, getIntegerArray };
+const updateFilm = (films, updatedFilm) => {
+  const index = films.findIndex((item) => item.id === updatedFilm.id);
+
+  if (index === -1) {
+    return films;
+  }
+
+  return [
+    ...films.slice(0, index),
+    updatedFilm,
+    ...films.slice(index + 1),
+  ];
+};
+
+export {getFilmYear, getDuration, humanizeDate, getRandomDay, getIntegerArray, updateFilm };
