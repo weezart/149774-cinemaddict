@@ -26,10 +26,8 @@ export default class FilmPresenter {
     const prevFilmCardComponent = this.#filmCardComponent;
     const prevFilmPopupComponent = this.#filmPopupComponent;
 
-    const filmComments = this.#comments.filter(({id}) => this.#film.comments.some((commentId) => commentId === Number(id)));
-
     this.#filmCardComponent = new FilmCardView(film);
-    this.#filmPopupComponent = new FilmDetailView(this.#film, filmComments);
+    this.#filmPopupComponent = new FilmDetailView(this.#film, this.#comments);
 
     this.#filmCardComponent.setClickHandler(this.#handleCardClick);
     this.#filmCardComponent.setWatchlistClickHandler(this.#handleWatchlistClick);

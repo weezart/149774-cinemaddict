@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {COMMENT_EMOTIONS} from '../const.js';
 import {getDuration, humanizeDate} from '../utils/film.js';
 
@@ -134,17 +134,23 @@ const createFilmDetailTemplate = (film, commentsList) => {
   );
 };
 
-export default class FilmDetailView extends AbstractView {
+export default class FilmDetailView extends AbstractStatefulView {
+  #comments = null;
+
   constructor(film, comments) {
     super();
 
-    this.film = film;
-    this.comments = comments;
+    this._state = FilmDetailView.parseFilmToState(film);
+    this.#comments = comments;
   }
 
   get template() {
-    return createFilmDetailTemplate(this.film, this.comments);
+    return createFilmDetailTemplate(this._state, this.#comments);
   }
+
+  static parseFilmToState = (film) => ({...film });
+
+  static parseStateToFilm = (state) => ({...state});
 
   setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
