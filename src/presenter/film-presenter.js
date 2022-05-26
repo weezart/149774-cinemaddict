@@ -24,7 +24,6 @@ export default class FilmPresenter {
     this.#comments = comments;
 
     const prevFilmCardComponent = this.#filmCardComponent;
-    const prevFilmPopupComponent = this.#filmPopupComponent;
 
     this.#filmCardComponent = new FilmCardView(film);
     this.#filmPopupComponent = new FilmDetailView(this.#film, this.#comments);
@@ -46,11 +45,9 @@ export default class FilmPresenter {
 
     if (this.#filmListContainer.contains(prevFilmCardComponent.element)) {
       replace(this.#filmCardComponent, prevFilmCardComponent);
-      replace(this.#filmPopupComponent, prevFilmPopupComponent);
     }
 
     remove(prevFilmCardComponent);
-    remove(prevFilmPopupComponent);
   };
 
   destroy = () => {
@@ -70,6 +67,7 @@ export default class FilmPresenter {
     document.body.classList.remove('hide-overflow');
     document.body.removeEventListener('keydown', this.#escKeyDownHandler);
     if (document.querySelector('.film-details')) {
+      this.#filmPopupComponent.reset(this.#film);
       document.querySelector('.film-details').remove();
     }
   };

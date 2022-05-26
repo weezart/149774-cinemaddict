@@ -17,6 +17,10 @@ const createFilmDetailTemplate = (film, commentsList) => {
     ? 'film-details__control-button--active'
     : '';
 
+  const commentEmojiTemplate = film.commentEmoji ?
+    `<img src="images/emoji/${film.commentEmoji}.png" width="55" height="55" alt="emoji-${film.commentEmoji}}">`
+    : '';
+
   return (
     `<section class="film-details" data-id="${id}">
       <form class="film-details__inner" action="" method="get">
@@ -112,10 +116,12 @@ const createFilmDetailTemplate = (film, commentsList) => {
             </ul>
 
             <div class="film-details__new-comment">
-              <div class="film-details__add-emoji-label"></div>
+              <div class="film-details__add-emoji-label">
+                ${commentEmojiTemplate}
+              </div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.commentText ? film.commentText : ''}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
@@ -142,15 +148,28 @@ export default class FilmDetailView extends AbstractStatefulView {
 
     this._state = FilmDetailView.parseFilmToState(film);
     this.#comments = comments;
+
+    this.#setInnerHandlers();
   }
 
   get template() {
     return createFilmDetailTemplate(this._state, this.#comments);
   }
 
-  static parseFilmToState = (film) => ({...film });
+  static parseFilmToState = (film) => ({
+    ...film,
+    commentEmoji: null,
+    commentText: null,
+    scrollTop: null
+  });
 
   static parseStateToFilm = (state) => ({...state});
+
+  reset = (film) => {
+    this.updateElement(
+      FilmDetailView.parseFilmToState(film),
+    );
+  };
 
   setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
@@ -172,19 +191,65 @@ export default class FilmDetailView extends AbstractStatefulView {
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
   };
 
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setClickHandler(this._callback.click);
+    this.setWatchlistClickHandler(this._callback.watchlistClick);
+    this.setWatchedClickHandler(this._callback.watchedClick);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
+  };
+
+  #restorePosition = () => {
+    this.element.scrollTop = this._state.scrollTop;
+    this.element.querySelector('.film-details__comment-input').scrollTop = this._state.scrollTop;
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelectorAll('.film-details__emoji-item')
+      .forEach((element) => element.addEventListener('click', this.#filmCommentEmojiClickHandler));
+    this.element.querySelector('.film-details__comment-input')
+      .addEventListener('input', this.#commentInputHandler);
+  };
+
+  #filmCommentEmojiClickHandler = (evt) => {
+    evt.preventDefault();
+    this.updateElement({
+      commentEmoji: evt.target.value,
+      scrollTop: this.element.scrollTop
+    });
+    this.element.querySelectorAll('.film-details__emoji-item')
+      .forEach((elem) => {
+        elem.checked = false;
+      });
+    evt.target.checked = true;
+    this.#restorePosition();
+  };
+
+  #commentInputHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      commentText: evt.target.value,
+    });
+    this.#restorePosition();
+  };
+
+
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.watchlistClick();
+    this.element.querySelector('.film-details__control-button--watchlist').classList.toggle('film-details__control-button--active');
   };
 
   #watchedClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.watchedClick();
+    this.element.querySelector('.film-details__control-button--watched').classList.toggle('film-details__control-button--active');
   };
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
+    this.element.querySelector('.film-details__control-button--favorite').classList.toggle('film-details__control-button--active');
   };
 
   #clickHandler = (evt) => {
