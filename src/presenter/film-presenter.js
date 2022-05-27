@@ -9,9 +9,9 @@ export default class FilmPresenter {
   #changeData = null;
 
   #filmCardComponent = null;
+  #filmPopupComponent = null;
 
   #film = null;
-  #filmPopup = null;
   #comments = null;
 
   constructor(filmListContainer, changeData) {
@@ -26,11 +26,17 @@ export default class FilmPresenter {
     const prevFilmCardComponent = this.#filmCardComponent;
 
     this.#filmCardComponent = new FilmCardView(film);
+    this.#filmPopupComponent = new FilmDetailView(this.#film, this.#comments);
 
     this.#filmCardComponent.setClickHandler(this.#handleCardClick);
     this.#filmCardComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#filmCardComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#filmCardComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+
+    this.#filmPopupComponent.setClickHandler(this.#hideFilmDetail);
+    this.#filmPopupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#filmPopupComponent.setWatchedClickHandler(this.#handleWatchedClick);
+    this.#filmPopupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
     if (prevFilmCardComponent === null) {
       render(this.#filmCardComponent, this.#filmListContainer);
@@ -46,20 +52,13 @@ export default class FilmPresenter {
 
   destroy = () => {
     remove(this.#filmCardComponent);
+    remove(this.#filmPopupComponent);
   };
 
   #showFilmDetail = () => {
     const footerElement = document.querySelector('.footer');
-    const filmComments = this.#comments.filter(({id}) => this.#film.comments.some((commentId) => commentId === Number(id)));
 
-    this.#filmPopup = new FilmDetailView(this.#film, filmComments);
-
-    this.#filmPopup.setClickHandler(this.#hideFilmDetail);
-    this.#filmPopup.setWatchlistClickHandler(this.#handleWatchlistClick);
-    this.#filmPopup.setWatchedClickHandler(this.#handleWatchedClick);
-    this.#filmPopup.setFavoriteClickHandler(this.#handleFavoriteClick);
-
-    render(this.#filmPopup, footerElement, RenderPosition.AFTEREND);
+    render(this.#filmPopupComponent, footerElement, RenderPosition.AFTEREND);
     document.body.addEventListener('keydown', this.#escKeyDownHandler);
     document.body.classList.add('hide-overflow');
   };
@@ -68,6 +67,7 @@ export default class FilmPresenter {
     document.body.classList.remove('hide-overflow');
     document.body.removeEventListener('keydown', this.#escKeyDownHandler);
     if (document.querySelector('.film-details')) {
+      this.#filmPopupComponent.reset(this.#film);
       document.querySelector('.film-details').remove();
     }
   };

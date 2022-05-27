@@ -39,13 +39,15 @@ const createFilmCardTemplate = (film) => {
 };
 
 export default class FilmCardView extends AbstractView {
+  #film = null;
+
   constructor(film) {
     super();
-    this.film = film;
+    this.#film = film;
   }
 
   get template() {
-    return createFilmCardTemplate(this.film);
+    return createFilmCardTemplate(this.#film);
   }
 
   setWatchlistClickHandler = (callback) => {

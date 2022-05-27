@@ -64,21 +64,21 @@ export default class FilmsPresenter {
     this.#topRatedFilms = updateFilm(this.#topRatedFilms, updatedFilm);
     this.#mostCommentedFilms = updateFilm(this.#mostCommentedFilms, updatedFilm);
 
-    this.#filmPresenter.get(updatedFilm.id).init(updatedFilm, this.#comments);
+    this.#filmPresenter.get(updatedFilm.id).init(updatedFilm, this.#getFilmComments(updatedFilm));
 
     if (this.#topRatedPresenter.get(updatedFilm.id)) {
-      this.#topRatedPresenter.get(updatedFilm.id).init(updatedFilm, this.#comments);
+      this.#topRatedPresenter.get(updatedFilm.id).init(updatedFilm, this.#getFilmComments(updatedFilm));
     }
 
     if (this.#mostCommentedPresenter.get(updatedFilm.id)) {
-      this.#mostCommentedPresenter.get(updatedFilm.id).init(updatedFilm, this.#comments);
+      this.#mostCommentedPresenter.get(updatedFilm.id).init(updatedFilm, this.#getFilmComments(updatedFilm));
     }
   };
 
   #renderFilm = (film, container, presenter) => {
     const filmPresenter = new FilmPresenter(container, this.#handleFilmChange);
 
-    filmPresenter.init(film, this.#comments);
+    filmPresenter.init(film, this.#getFilmComments(film));
 
     if(presenter === this.#filmPresenter) {
       this.#filmPresenter.set(film.id, filmPresenter);
@@ -88,6 +88,8 @@ export default class FilmsPresenter {
       this.#mostCommentedPresenter.set(film.id, filmPresenter);
     }
   };
+
+  #getFilmComments = (film) => this.#comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
 
   #renderFilms = (from, to, container, presenter) => {
     this.#filmsList
