@@ -1,6 +1,7 @@
 import {render, remove} from '../framework/render.js';
 import {FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
 import {updateFilm} from '../utils/film.js';
+import SortView from '../view/sort-view.js';
 import FilmsView from '../view/films-view.js';
 import FilmsListView from '../view/films-list-view.js';
 import FilmsListTopRatedView from '../view/films-list-top-rated-view.js';
@@ -23,6 +24,7 @@ export default class FilmsPresenter {
   #topRatedPresenter = new Map();
   #mostCommentedPresenter = new Map();
 
+  #filmsSort = new SortView;
   #filmsComponent = new FilmsView();
   #filmsListComponent = new FilmsListView();
   #filmsListTopRatedComponent = new FilmsListTopRatedView();
@@ -141,7 +143,12 @@ export default class FilmsPresenter {
     this.#loadMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
   };
 
+  #renderSort = () => {
+    render(this.#filmsSort, this.#filmsContainer);
+  };
+
   #renderBoard = () => {
+    this.#renderSort();
     render(this.#filmsComponent, this.#filmsContainer);
 
     if (this.#filmsList.length === 0) {
