@@ -101,11 +101,17 @@ export default class FilmsPresenter {
   };
 
   #handleModelEvent = (updateType, data) => {
-    console.log(updateType, data);
-    // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#filmPresenter.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        // - обновить список (например, когда задача ушла в архив)
+        break;
+      case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+        break;
+    }
   };
 
   #renderFilm = (film, container, presenter) => {
