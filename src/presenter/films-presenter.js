@@ -1,6 +1,6 @@
 import {render, remove} from '../framework/render.js';
 import {FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
-import {SortType} from '../const.js';
+import {SortType, UpdateType, UserAction} from '../const.js';
 import {sortFilmsByDate, sortFilmsByRating} from '../utils/film.js';
 import SortView from '../view/sort-view.js';
 import FilmsView from '../view/films-view.js';
@@ -16,7 +16,7 @@ import FilmPresenter from './film-presenter.js';
 export default class FilmsPresenter {
   #filmsContainer = null;
   #filmsModel = null;
-  #comments = [];
+  #commentsModel = null;
   #renderedFilmCount = FILM_COUNT_PER_STEP;
   #filmPresenter = new Map();
   #topRatedPresenter = new Map();
@@ -34,9 +34,10 @@ export default class FilmsPresenter {
   #loadMoreButtonComponent = new LoadMoreButtonView();
   #currentSortType = SortType.DEFAULT;
 
-  constructor(filmsContainer, filmsModel) {
+  constructor(filmsContainer, filmsModel, commentsModel) {
     this.#filmsContainer = filmsContainer;
     this.#filmsModel = filmsModel;
+    this.#commentsModel = commentsModel;
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
   }
@@ -52,6 +53,10 @@ export default class FilmsPresenter {
     return this.#filmsModel.films;
   }
 
+  get comments() {
+    return this.#commentsModel.comments;
+  }
+
   get topRatedFilms () {
     return [...this.#filmsModel.films]
       .sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating)
@@ -65,8 +70,6 @@ export default class FilmsPresenter {
   }
 
   init = () => {
-    this.#comments = [...this.#filmsModel.comments];
-
     this.#renderBoard();
   };
 
@@ -84,11 +87,17 @@ export default class FilmsPresenter {
   };
 
   #handleViewAction = (actionType, updateType, update) => {
-    console.log(actionType, updateType, update);
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
+    switch (actionType) {
+      case UserAction.UPDATE_FILM:
+        this.#filmsModel.updateFilm(updateType, update);
+        break;
+      case UserAction.ADD_FILM:
+        this.#filmsModel.addFilm(updateType, update);
+        break;
+      case UserAction.DELETE_FILM:
+        this.#filmsModel.deleteFilm(updateType, update);
+        break;
+    }
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -113,7 +122,7 @@ export default class FilmsPresenter {
     }
   };
 
-  #getFilmComments = (film) => this.#comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
+  #getFilmComments = (film) => this.comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
 
   #renderFilms = (films, container, presenter) => {
     films.forEach((film) => this.#renderFilm(film, container, presenter));
