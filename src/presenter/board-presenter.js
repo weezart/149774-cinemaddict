@@ -1,6 +1,5 @@
 import {render, remove} from '../framework/render.js';
-import {FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
-import {SortType, UpdateType, UserAction} from '../const.js';
+import {SortType, UpdateType, UserAction, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
 import {sortFilmsByDate, sortFilmsByRating} from '../utils/film.js';
 import SortView from '../view/sort-view.js';
 import FilmsView from '../view/films-view.js';
@@ -13,16 +12,14 @@ import NoFilmsView from '../view/no-films-view';
 import FilmPresenter from './film-presenter.js';
 
 
-export default class FilmsPresenter {
-  #filmsContainer = null;
+export default class BoardPresenter {
+  #boardContainer = null;
   #filmsModel = null;
   #commentsModel = null;
   #renderedFilmCount = FILM_COUNT_PER_STEP;
-  #filmPresenter = new Map();
-  #topRatedPresenter = new Map();
-  #mostCommentedPresenter = new Map();
 
-  #filmsSort = new SortView;
+  #filmPresenter = new Map();
+
   #filmsComponent = new FilmsView();
   #filmsListComponent = new FilmsListView();
   #filmsListTopRatedComponent = new FilmsListTopRatedView();
@@ -31,11 +28,12 @@ export default class FilmsPresenter {
   #filmsContainerTopRatedComponent = new FilmsContainer();
   #filmsContainerMostCommentedComponent = new FilmsContainer();
   #noFilmComponent = new NoFilmsView();
-  #loadMoreButtonComponent = new LoadMoreButtonView();
+  #sortComponent = null;
+  #loadMoreButtonComponent = null;
   #currentSortType = SortType.DEFAULT;
 
-  constructor(filmsContainer, filmsModel, commentsModel) {
-    this.#filmsContainer = filmsContainer;
+  constructor(boardContainer, filmsModel, commentsModel) {
+    this.#boardContainer = boardContainer;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
 
@@ -78,7 +76,7 @@ export default class FilmsPresenter {
     const newRenderedFilmsCount = Math.min(filmsCount, this.#renderedFilmCount + FILM_COUNT_PER_STEP);
     const films = this.films.slice(this.#renderedFilmCount, newRenderedFilmsCount);
 
-    this.#renderFilms(films);
+    this.#renderFilms(films, this.#filmsContainerComponent.element, this.#filmPresenter);
     this.#renderedFilmCount = newRenderedFilmsCount;
 
     if (this.#renderedFilmCount >= filmsCount) {
@@ -106,32 +104,27 @@ export default class FilmsPresenter {
         this.#filmPresenter.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
+        this.#clearBoard;
+        this.#renderBoard();
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
+        this.#clearBoard({resetRenderedFilmsCount: true, resetSortType: true});
+        this.#renderBoard();
         break;
     }
   };
 
-  #renderFilm = (film, container, presenter) => {
+  #renderFilm = (film, container) => {
     const filmPresenter = new FilmPresenter(container, this.#handleViewAction);
 
     filmPresenter.init(film, this.#getFilmComments(film));
-
-    if(presenter === this.#filmPresenter) {
-      this.#filmPresenter.set(film.id, filmPresenter);
-    } else if (presenter === this.#topRatedPresenter) {
-      this.#topRatedPresenter.set(film.id, filmPresenter);
-    } else if (presenter === this.#mostCommentedPresenter) {
-      this.#mostCommentedPresenter.set(film.id, filmPresenter);
-    }
+    this.#filmPresenter.set(film.id, filmPresenter);
   };
 
   #getFilmComments = (film) => this.comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
 
-  #renderFilms = (films, container, presenter) => {
-    films.forEach((film) => this.#renderFilm(film, container, presenter));
+  #renderFilms = (films, container) => {
+    films.forEach((film) => this.#renderFilm(film, container));
   };
 
   #renderFilmList = () => {
@@ -140,7 +133,7 @@ export default class FilmsPresenter {
 
     const films = this.films.slice(0, FILMS_COUNT_ON_START);
 
-    this.#renderFilms(films, this.#filmsContainerComponent.element, this.#filmPresenter);
+    this.#renderFilms(films, this.#filmsContainerComponent.element);
 
     if (filmsCount.length > FILM_COUNT_PER_STEP) {
       this.#renderLoadMoreButton();
@@ -154,18 +147,47 @@ export default class FilmsPresenter {
     remove(this.#loadMoreButtonComponent);
   };
 
+  #clearBoard = ({resetRenderedFilmsCount = false, resetSortType = false} = {}) => {
+    const filmsCount = this.films.length;
+
+    this.#filmPresenter.forEach((presenter) => presenter.destroy());
+    this.#filmPresenter.clear();
+
+    remove(this.#sortComponent);
+    remove(this.#noFilmComponent);
+    remove(this.#loadMoreButtonComponent);
+    remove(this.#filmsListMostCommentedComponent);
+    remove(this.#filmsContainerMostCommentedComponent);
+    remove(this.#filmsListTopRatedComponent);
+    remove(this.#filmsContainerTopRatedComponent);
+
+
+    if (resetRenderedFilmsCount) {
+      this.#renderedFilmCount = FILM_COUNT_PER_STEP;
+    } else {
+      // На случай, если перерисовка доски вызвана
+      // уменьшением количества задач (например, удаление или перенос в архив)
+      // нужно скорректировать число показанных задач
+      this.#renderedFilmCount = Math.min(filmsCount, this.#renderedFilmCount);
+    }
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DEFAULT;
+    }
+  };
+
   #renderMostCommentedList = () => {
     render(this.#filmsListMostCommentedComponent, this.#filmsComponent.element);
     render(this.#filmsContainerMostCommentedComponent, this.#filmsListMostCommentedComponent.element);
 
-    this.mostCommentedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerMostCommentedComponent.element, this.#mostCommentedPresenter));
+    this.mostCommentedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerMostCommentedComponent.element));
   };
 
   #renderTopRatedList = () => {
     render(this.#filmsListTopRatedComponent, this.#filmsComponent.element);
     render(this.#filmsContainerTopRatedComponent, this.#filmsListTopRatedComponent.element);
 
-    this.topRatedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerTopRatedComponent.element, this.#topRatedPresenter));
+    this.topRatedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerTopRatedComponent.element));
   };
 
   #renderNoFilms = () => {
@@ -173,9 +195,10 @@ export default class FilmsPresenter {
   };
 
   #renderLoadMoreButton = () => {
-    render(this.#loadMoreButtonComponent, this.#filmsListComponent.element);
-
+    this.#loadMoreButtonComponent = new LoadMoreButtonView();
     this.#loadMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
+
+    render(this.#loadMoreButtonComponent, this.#filmsListComponent.element);
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -184,20 +207,28 @@ export default class FilmsPresenter {
     }
 
     this.#currentSortType = sortType;
-    this.#clearFilmList();
-    this.#renderFilmList();
+    this.#clearBoard({resetRenderedTaskCount: true});
+    this.#renderBoard();
   };
 
   #renderSort = () => {
-    render(this.#filmsSort, this.#filmsContainer);
-    this.#filmsSort.setSortTypeChangeHandler(this.#handleSortTypeChange);
+    this.#sortComponent = new SortView(this.#currentSortType);
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+
+    render(this.#sortComponent, this.#boardContainer);
   };
 
   #renderBoard = () => {
-    this.#renderSort();
-    render(this.#filmsComponent, this.#filmsContainer);
+    const films = this.films;
+    const filmsCount = films.length;
 
-    if (this.films.length === 0) {
+    if (filmsCount !== 0) {
+      this.#renderSort();
+    }
+
+    render(this.#filmsComponent, this.#boardContainer);
+
+    if (filmsCount === 0) {
       this.#renderNoFilms();
       return;
     }
@@ -205,7 +236,16 @@ export default class FilmsPresenter {
     render(this.#filmsListComponent, this.#filmsComponent.element);
     render(this.#filmsContainerComponent, this.#filmsListComponent.element);
 
-    this.#renderFilmList();
+    // Теперь, когда #renderBoard рендерит доску не только на старте,
+    // но и по ходу работы приложения, нужно заменить
+    // константу TASK_COUNT_PER_STEP на свойство #renderedTaskCount,
+    // чтобы в случае перерисовки сохранить N-показанных карточек
+    this.#renderFilms(films.slice(0, Math.min(filmsCount, this.#renderedFilmCount)), this.#filmsContainerComponent.element);
+
+    if (filmsCount > this.#renderedFilmCount) {
+      this.#renderLoadMoreButton();
+    }
+
     this.#renderMostCommentedList();
     this.#renderTopRatedList();
   };
