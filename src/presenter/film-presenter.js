@@ -1,7 +1,7 @@
 import {render, remove, replace, RenderPosition} from '../framework/render.js';
 import FilmCardView from '../view/film-card-view.js';
 import FilmDetailView from '../view/film-detail-view.js';
-import {IS_PRESSED_ESCAPE_KEY} from '../const.js';
+import {UserAction, UpdateType, IS_PRESSED_ESCAPE_KEY} from '../const.js';
 
 
 export default class FilmPresenter {
@@ -88,14 +88,26 @@ export default class FilmPresenter {
   };
 
   #handleWatchlistClick = () => {
-    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, watchlist: !this.#film.userDetails.watchlist}});
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      {...this.#film, userDetails: {...this.#film.userDetails, watchlist: !this.#film.userDetails.watchlist}}
+    );
   };
 
   #handleWatchedClick = () => {
-    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, alreadyWatched: !this.#film.userDetails.alreadyWatched}});
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      {...this.#film, userDetails: {...this.#film.userDetails, alreadyWatched: !this.#film.userDetails.alreadyWatched}}
+    );
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, favorite: !this.#film.userDetails.favorite}});
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      {...this.#film, userDetails: {...this.#film.userDetails, favorite: !this.#film.userDetails.favorite}}
+    );
   };
 }

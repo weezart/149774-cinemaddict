@@ -24,20 +24,6 @@ const getRandomDay = (rangeType, min, max) => {
   return dayjs().add(daysGap, rangeType).toDate();
 };
 
-const updateFilm = (films, updatedFilm) => {
-  const index = films.findIndex((item) => item.id === updatedFilm.id);
-
-  if (index === -1) {
-    return films;
-  }
-
-  return [
-    ...films.slice(0, index),
-    updatedFilm,
-    ...films.slice(index + 1),
-  ];
-};
-
 const getWeightForNull = (A, B) => {
   if (A === null && B === null) {
     return 0;
@@ -64,4 +50,4 @@ const sortFilmsByRating = (filmA, filmB) => {
   return weight ?? filmB.filmInfo.totalRating - filmA.filmInfo.totalRating;
 };
 
-export {getFilmYear, getDuration, humanizeDate, getRandomDay, getIntegerArray, updateFilm, sortFilmsByDate, sortFilmsByRating };
+export {getFilmYear, getDuration, humanizeDate, getRandomDay, getIntegerArray, sortFilmsByDate, sortFilmsByRating };

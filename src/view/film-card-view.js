@@ -1,5 +1,4 @@
 import AbstractView from '../framework/view/abstract-view.js';
-
 import { getDuration, getFilmYear} from '../utils/film.js';
 
 const createFilmCardTemplate = (film) => {

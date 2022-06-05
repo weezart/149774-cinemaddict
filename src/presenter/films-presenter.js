@@ -1,7 +1,7 @@
 import {render, remove} from '../framework/render.js';
 import {FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
 import {SortType} from '../const.js';
-import {updateFilm, sortFilmsByDate, sortFilmsByRating} from '../utils/film.js';
+import {sortFilmsByDate, sortFilmsByRating} from '../utils/film.js';
 import SortView from '../view/sort-view.js';
 import FilmsView from '../view/films-view.js';
 import FilmsListView from '../view/films-list-view.js';
@@ -16,10 +16,7 @@ import FilmPresenter from './film-presenter.js';
 export default class FilmsPresenter {
   #filmsContainer = null;
   #filmsModel = null;
-  #filmsList = [];
   #comments = [];
-  #topRatedFilms = [];
-  #mostCommentedFilms = [];
   #renderedFilmCount = FILM_COUNT_PER_STEP;
   #filmPresenter = new Map();
   #topRatedPresenter = new Map();
@@ -36,58 +33,74 @@ export default class FilmsPresenter {
   #noFilmComponent = new NoFilmsView();
   #loadMoreButtonComponent = new LoadMoreButtonView();
   #currentSortType = SortType.DEFAULT;
-  #sourcedFilms = [];
 
   constructor(filmsContainer, filmsModel) {
     this.#filmsContainer = filmsContainer;
     this.#filmsModel = filmsModel;
+
+    this.#filmsModel.addObserver(this.#handleModelEvent);
   }
 
   get films() {
+    switch (this.#currentSortType) {
+      case SortType.DATE:
+        return [...this.#filmsModel.films].sort(sortFilmsByDate);
+      case SortType.RATING:
+        return [...this.#filmsModel.films].sort(sortFilmsByRating);
+    }
+
     return this.#filmsModel.films;
   }
 
+  get topRatedFilms () {
+    return [...this.#filmsModel.films]
+      .sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating)
+      .slice(0, Math.min(this.films.length, EXTRA_FILM_COUNT));
+  }
+
+  get mostCommentedFilms () {
+    return [...this.#filmsModel.films]
+      .sort((a, b) => b.comments.length - a.comments.length)
+      .slice(0, Math.min(this.films.length, EXTRA_FILM_COUNT));
+  }
+
   init = () => {
-    this.#filmsList = [...this.#filmsModel.films];
-    this.#sourcedFilms = [...this.#filmsModel.films];
     this.#comments = [...this.#filmsModel.comments];
-    this.#topRatedFilms = this.#filmsList.slice(0, EXTRA_FILM_COUNT);
-    this.#mostCommentedFilms = this.#filmsList.slice(0, EXTRA_FILM_COUNT);
 
     this.#renderBoard();
   };
 
   #handleLoadMoreButtonClick = () => {
-    this.#filmsList
-      .slice(this.#renderedFilmCount, this.#renderedFilmCount + FILM_COUNT_PER_STEP)
-      .forEach((film) => this.#renderFilm(film, this.#filmsContainerComponent.element, this.#filmPresenter));
+    const filmsCount = this.films.length;
+    const newRenderedFilmsCount = Math.min(filmsCount, this.#renderedFilmCount + FILM_COUNT_PER_STEP);
+    const films = this.films.slice(this.#renderedFilmCount, newRenderedFilmsCount);
 
-    this.#renderedFilmCount += FILM_COUNT_PER_STEP;
+    this.#renderFilms(films);
+    this.#renderedFilmCount = newRenderedFilmsCount;
 
-    if (this.#renderedFilmCount >= this.#filmsList.length) {
+    if (this.#renderedFilmCount >= filmsCount) {
       remove(this.#loadMoreButtonComponent);
     }
   };
 
-  #handleFilmChange = (updatedFilm) => {
-    this.#filmsList = updateFilm(this.#filmsList, updatedFilm);
-    this.#topRatedFilms = updateFilm(this.#topRatedFilms, updatedFilm);
-    this.#mostCommentedFilms = updateFilm(this.#mostCommentedFilms, updatedFilm);
-    this.#sourcedFilms = updateFilm(this.#sourcedFilms, updatedFilm);
+  #handleViewAction = (actionType, updateType, update) => {
+    console.log(actionType, updateType, update);
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+  };
 
-    this.#filmPresenter.get(updatedFilm.id).init(updatedFilm, this.#getFilmComments(updatedFilm));
-
-    if (this.#topRatedPresenter.get(updatedFilm.id)) {
-      this.#topRatedPresenter.get(updatedFilm.id).init(updatedFilm, this.#getFilmComments(updatedFilm));
-    }
-
-    if (this.#mostCommentedPresenter.get(updatedFilm.id)) {
-      this.#mostCommentedPresenter.get(updatedFilm.id).init(updatedFilm, this.#getFilmComments(updatedFilm));
-    }
+  #handleModelEvent = (updateType, data) => {
+    console.log(updateType, data);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
   };
 
   #renderFilm = (film, container, presenter) => {
-    const filmPresenter = new FilmPresenter(container, this.#handleFilmChange);
+    const filmPresenter = new FilmPresenter(container, this.#handleViewAction);
 
     filmPresenter.init(film, this.#getFilmComments(film));
 
@@ -102,18 +115,19 @@ export default class FilmsPresenter {
 
   #getFilmComments = (film) => this.#comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
 
-  #renderFilms = (from, to, container, presenter) => {
-    this.#filmsList
-      .slice(from, to)
-      .forEach((film) => this.#renderFilm(film, container, presenter));
+  #renderFilms = (films, container, presenter) => {
+    films.forEach((film) => this.#renderFilm(film, container, presenter));
   };
 
   #renderFilmList = () => {
-    const FILMS_COUNT_ON_START = Math.min(this.#filmsList.length, FILM_COUNT_PER_STEP);
+    const filmsCount = this.films.length;
+    const FILMS_COUNT_ON_START = Math.min(filmsCount, FILM_COUNT_PER_STEP);
 
-    this.#renderFilms(0, FILMS_COUNT_ON_START, this.#filmsContainerComponent.element, this.#filmPresenter);
+    const films = this.films.slice(0, FILMS_COUNT_ON_START);
 
-    if (this.#filmsList.length > FILM_COUNT_PER_STEP) {
+    this.#renderFilms(films, this.#filmsContainerComponent.element, this.#filmPresenter);
+
+    if (filmsCount.length > FILM_COUNT_PER_STEP) {
       this.#renderLoadMoreButton();
     }
   };
@@ -129,14 +143,14 @@ export default class FilmsPresenter {
     render(this.#filmsListMostCommentedComponent, this.#filmsComponent.element);
     render(this.#filmsContainerMostCommentedComponent, this.#filmsListMostCommentedComponent.element);
 
-    this.#mostCommentedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerMostCommentedComponent.element, this.#mostCommentedPresenter));
+    this.mostCommentedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerMostCommentedComponent.element, this.#mostCommentedPresenter));
   };
 
   #renderTopRatedList = () => {
     render(this.#filmsListTopRatedComponent, this.#filmsComponent.element);
     render(this.#filmsContainerTopRatedComponent, this.#filmsListTopRatedComponent.element);
 
-    this.#topRatedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerTopRatedComponent.element, this.#topRatedPresenter));
+    this.topRatedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerTopRatedComponent.element, this.#topRatedPresenter));
   };
 
   #renderNoFilms = () => {
@@ -149,27 +163,12 @@ export default class FilmsPresenter {
     this.#loadMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
   };
 
-  #sortFilms = (sortType) => {
-    switch (sortType) {
-      case SortType.DATE:
-        this.#filmsList.sort(sortFilmsByDate);
-        break;
-      case SortType.RATING:
-        this.#filmsList.sort(sortFilmsByRating);
-        break;
-      default:
-        this.#filmsList = [...this.#sourcedFilms];
-    }
-
-    this.#currentSortType = sortType;
-  };
-
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
     }
 
-    this.#sortFilms(sortType);
+    this.#currentSortType = sortType;
     this.#clearFilmList();
     this.#renderFilmList();
   };
@@ -183,7 +182,7 @@ export default class FilmsPresenter {
     this.#renderSort();
     render(this.#filmsComponent, this.#filmsContainer);
 
-    if (this.#filmsList.length === 0) {
+    if (this.films.length === 0) {
       this.#renderNoFilms();
       return;
     }
