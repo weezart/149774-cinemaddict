@@ -19,6 +19,8 @@ export default class BoardPresenter {
   #renderedFilmCount = FILM_COUNT_PER_STEP;
 
   #filmPresenter = new Map();
+  #topRatedPresenter = new Map();
+  #mostCommentedPresenter = new Map();
 
   #filmsComponent = new FilmsView();
   #filmsListComponent = new FilmsListView();
@@ -104,7 +106,7 @@ export default class BoardPresenter {
         this.#filmPresenter.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
-        this.#clearBoard;
+        this.#clearBoard();
         this.#renderBoard();
         break;
       case UpdateType.MAJOR:
@@ -114,17 +116,24 @@ export default class BoardPresenter {
     }
   };
 
-  #renderFilm = (film, container) => {
+  #renderFilm = (film, container, presenter) => {
     const filmPresenter = new FilmPresenter(container, this.#handleViewAction);
 
     filmPresenter.init(film, this.#getFilmComments(film));
-    this.#filmPresenter.set(film.id, filmPresenter);
+
+    if(presenter === this.#filmPresenter) {
+      this.#filmPresenter.set(film.id, filmPresenter);
+    } else if (presenter === this.#topRatedPresenter) {
+      this.#topRatedPresenter.set(film.id, filmPresenter);
+    } else if (presenter === this.#mostCommentedPresenter) {
+      this.#mostCommentedPresenter.set(film.id, filmPresenter);
+    }
   };
 
   #getFilmComments = (film) => this.comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
 
-  #renderFilms = (films, container) => {
-    films.forEach((film) => this.#renderFilm(film, container));
+  #renderFilms = (films, container, presenter) => {
+    films.forEach((film) => this.#renderFilm(film, container, presenter));
   };
 
   #renderFilmList = () => {
@@ -133,7 +142,7 @@ export default class BoardPresenter {
 
     const films = this.films.slice(0, FILMS_COUNT_ON_START);
 
-    this.#renderFilms(films, this.#filmsContainerComponent.element);
+    this.#renderFilms(films, this.#filmsContainerComponent.element, this.#filmPresenter);
 
     if (filmsCount.length > FILM_COUNT_PER_STEP) {
       this.#renderLoadMoreButton();
@@ -180,14 +189,14 @@ export default class BoardPresenter {
     render(this.#filmsListMostCommentedComponent, this.#filmsComponent.element);
     render(this.#filmsContainerMostCommentedComponent, this.#filmsListMostCommentedComponent.element);
 
-    this.mostCommentedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerMostCommentedComponent.element));
+    this.mostCommentedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerMostCommentedComponent.element, this.#mostCommentedPresenter));
   };
 
   #renderTopRatedList = () => {
     render(this.#filmsListTopRatedComponent, this.#filmsComponent.element);
     render(this.#filmsContainerTopRatedComponent, this.#filmsListTopRatedComponent.element);
 
-    this.topRatedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerTopRatedComponent.element));
+    this.topRatedFilms.forEach((film) => this.#renderFilm(film, this.#filmsContainerTopRatedComponent.element, this.#mostCommentedPresenter));
   };
 
   #renderNoFilms = () => {
@@ -240,7 +249,7 @@ export default class BoardPresenter {
     // но и по ходу работы приложения, нужно заменить
     // константу TASK_COUNT_PER_STEP на свойство #renderedTaskCount,
     // чтобы в случае перерисовки сохранить N-показанных карточек
-    this.#renderFilms(films.slice(0, Math.min(filmsCount, this.#renderedFilmCount)), this.#filmsContainerComponent.element);
+    this.#renderFilms(films.slice(0, Math.min(filmsCount, this.#renderedFilmCount)), this.#filmsContainerComponent.element, this.#filmPresenter);
 
     if (filmsCount > this.#renderedFilmCount) {
       this.#renderLoadMoreButton();
