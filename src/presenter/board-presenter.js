@@ -136,25 +136,6 @@ export default class BoardPresenter {
     films.forEach((film) => this.#renderFilm(film, container, presenter));
   };
 
-  #renderFilmList = () => {
-    const filmsCount = this.films.length;
-    const FILMS_COUNT_ON_START = Math.min(filmsCount, FILM_COUNT_PER_STEP);
-
-    const films = this.films.slice(0, FILMS_COUNT_ON_START);
-
-    this.#renderFilms(films, this.#filmsContainerComponent.element, this.#filmPresenter);
-
-    if (filmsCount.length > FILM_COUNT_PER_STEP) {
-      this.#renderLoadMoreButton();
-    }
-  };
-
-  #clearFilmList = () => {
-    this.#filmPresenter.forEach((presenter) => presenter.destroy());
-    this.#filmPresenter.clear();
-    this.#renderedFilmCount = FILM_COUNT_PER_STEP;
-    remove(this.#loadMoreButtonComponent);
-  };
 
   #clearBoard = ({resetRenderedFilmsCount = false, resetSortType = false} = {}) => {
     const filmsCount = this.films.length;
