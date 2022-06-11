@@ -1,5 +1,5 @@
 import {render, remove} from '../framework/render.js';
-import {SortType, UpdateType, UserAction, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
+import {SortType, FilterType, UpdateType, UserAction, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
 import {sortFilmsByDate, sortFilmsByRating} from '../utils/film.js';
 import {filter} from '../utils/filter.js';
 import SortView from '../view/sort-view.js';
@@ -31,10 +31,11 @@ export default class BoardPresenter {
   #filmsContainerComponent = new FilmsContainer();
   #filmsContainerTopRatedComponent = new FilmsContainer();
   #filmsContainerMostCommentedComponent = new FilmsContainer();
-  #noFilmComponent = new NoFilmsView();
+  #noFilmComponent = null;
   #sortComponent = null;
   #loadMoreButtonComponent = null;
   #currentSortType = SortType.DEFAULT;
+  #filterType = FilterType.ALL;
 
   constructor(boardContainer, filmsModel, commentsModel, filterModel) {
     this.#boardContainer = boardContainer;
@@ -47,9 +48,9 @@ export default class BoardPresenter {
   }
 
   get films() {
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const films = this.#filmsModel.films;
-    const filteredFilms = filter[filterType](films);
+    const filteredFilms = filter[this.#filterType](films);
 
     switch (this.#currentSortType) {
       case SortType.DATE:
@@ -152,7 +153,9 @@ export default class BoardPresenter {
     this.#filmPresenter.clear();
 
     remove(this.#sortComponent);
-    remove(this.#noFilmComponent);
+    if (this.#noFilmComponent) {
+      remove(this.#noFilmComponent);
+    }
     remove(this.#loadMoreButtonComponent);
     remove(this.#filmsListMostCommentedComponent);
     remove(this.#filmsContainerMostCommentedComponent);
@@ -163,9 +166,6 @@ export default class BoardPresenter {
     if (resetRenderedFilmsCount) {
       this.#renderedFilmCount = FILM_COUNT_PER_STEP;
     } else {
-      // На случай, если перерисовка доски вызвана
-      // уменьшением количества задач (например, удаление или перенос в архив)
-      // нужно скорректировать число показанных задач
       this.#renderedFilmCount = Math.min(filmsCount, this.#renderedFilmCount);
     }
 
@@ -189,6 +189,7 @@ export default class BoardPresenter {
   };
 
   #renderNoFilms = () => {
+    this.#noFilmComponent = new NoFilmsView(this.#filterType);
     render(this.#noFilmComponent, this.#filmsComponent.element);
   };
 
