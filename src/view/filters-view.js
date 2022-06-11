@@ -24,9 +24,10 @@ export default class FiltersView extends AbstractView {
   #filters = null;
   #currentFilter = null;
 
-  constructor(filters) {
+  constructor(filters, currentFilterType) {
     super();
     this.#filters = filters;
+    this.#currentFilter = currentFilterType;
   }
 
   get template() {
@@ -35,11 +36,17 @@ export default class FiltersView extends AbstractView {
 
   setFilterTypeChangeHandler = (callback) => {
     this._callback.filterTypeChange = callback;
-    this.element.addEventListener('change', this.#filterTypeChangeHandler);
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
   };
 
   #filterTypeChangeHandler = (evt) => {
+    if (evt.target.tagName !== 'A') {
+      return;
+    }
+
+    console.log('Событие отработало', this.#filters, this.#currentFilter);
+
     evt.preventDefault();
-    this._callback.filterTypeChange(evt.target.value);
+    this._callback.filterTypeChange(evt.target.dataset.filterType);
   };
 }
