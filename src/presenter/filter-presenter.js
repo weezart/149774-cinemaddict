@@ -25,7 +25,7 @@ export default class FilterPresenter {
     return [
       {
         type: FilterType.ALL,
-        name: 'All',
+        name: 'All Movies',
         count: filter[FilterType.ALL](films).length,
       },
       {

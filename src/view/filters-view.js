@@ -4,8 +4,8 @@ const createFiltersItemTemplate = (filter, currentFilterType) => {
   const {type, name, count} = filter;
 
   return (
-    `<a href="#${name.toLowerCase()}" class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}">
-      ${name} <span class="main-navigation__item-count">${count}</span>
+    `<a href="#${name.toLowerCase()}" data-filter-type="${name}" class="main-navigation__item ${name === currentFilterType ? 'main-navigation__item--active' : ''}">
+      ${name} ${type !== 'All' ? `<span class="main-navigation__item-count">${count}</span>` : ''}
     </a>`
   );
 };
@@ -43,8 +43,6 @@ export default class FiltersView extends AbstractView {
     if (evt.target.tagName !== 'A') {
       return;
     }
-
-    console.log('Событие отработало', this.#filters, this.#currentFilter);
 
     evt.preventDefault();
     this._callback.filterTypeChange(evt.target.dataset.filterType);

@@ -7,7 +7,7 @@ export const FILM_COUNT_PER_STEP = 5;
 export const EXTRA_FILM_COUNT = 2;
 
 export const FilterType = {
-  All: 'All movies',
+  ALL: 'All',
   WATCHLIST: 'Watchlist',
   HISTORY: 'History',
   FAVORITES: 'Favorites',

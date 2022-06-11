@@ -14,7 +14,7 @@ const footerStatsElement = document.querySelector('.footer__statistics');
 const filmsModel = new FilmsModel();
 const commentsModel = new CommentsModel();
 const filterModel = new FilterModel();
-const boardPresenter = new BoardPresenter(siteMainElement, filmsModel, commentsModel);
+const boardPresenter = new BoardPresenter(siteMainElement, filmsModel, commentsModel, filterModel);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
 
 render(new ProfileView(), siteHeaderElement);
