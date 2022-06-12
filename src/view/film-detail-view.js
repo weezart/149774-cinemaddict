@@ -166,6 +166,8 @@ export default class FilmDetailView extends AbstractStatefulView {
   static parseStateToFilm = (state) => ({...state});
 
   reset = (film) => {
+    console.log(this);
+
     this.updateElement(
       FilmDetailView.parseFilmToState(film),
     );
