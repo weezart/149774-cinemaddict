@@ -66,10 +66,6 @@ export default class BoardPresenter {
     return filteredFilms;
   }
 
-  get comments() {
-    return this.#commentsModel.comments;
-  }
-
   get topRatedFilms () {
     return [...this.#filmsModel.films]
       .sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating)
@@ -107,9 +103,9 @@ export default class BoardPresenter {
       case UserAction.DELETE_COMMENT:
         this.#filmsModel.updateFilm(updateType, update);
         break;
-      // case UserAction.ADD_COMMENT:
-      //   this.#filmsModel.addFilm(updateType, update);
-      //   break;
+      case UserAction.ADD_COMMENT:
+        this.#filmsModel.updateFilm(updateType, update);
+        break;
     }
   };
 
@@ -138,7 +134,7 @@ export default class BoardPresenter {
   #renderFilm = (film, container) => {
     const filmPresenter = new FilmPresenter(container, this.#pageBodyElement, this.#commentsModel, this.#handleViewAction, this.#handleModeChange);
 
-    filmPresenter.init(film, this.#getFilmComments(film));
+    filmPresenter.init(film);
 
     if (this.#filmPresenter.has(film.id)) {
       this.#filmPresenter.get(film.id).push(filmPresenter);
@@ -146,8 +142,6 @@ export default class BoardPresenter {
     }
     this.#filmPresenter.set(film.id, [filmPresenter]);
   };
-
-  #getFilmComments = (film) => this.comments.filter(({id}) => film.comments.some((commentId) => commentId === Number(id)));
 
   #renderFilms = (films, container) => {
     films.forEach((film) => this.#renderFilm(film, container));
@@ -245,7 +239,7 @@ export default class BoardPresenter {
     }
 
     const updateFilm = this.#filmsModel.films.filter((film) => film.id === this.#openFilmPresenter.film.id)[0];
-    this.#openFilmPresenter.init(updateFilm, this.#getFilmComments(this.#openFilmPresenter.film));
+    this.#openFilmPresenter.init(updateFilm);
   };
 
   #renderBoard = () => {

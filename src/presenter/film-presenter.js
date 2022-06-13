@@ -30,9 +30,9 @@ export default class FilmPresenter {
     return this.#film;
   }
 
-  init = (film, comments) => {
+  init = (film) => {
     this.#film = film;
-    this.#comments = comments;
+    this.#comments = this.#getCommentsByFilm();
 
     const prevFilmCardComponent = this.#filmCardComponent;
     const prevPopupComponent =  this.#filmPopupComponent;
@@ -50,6 +50,7 @@ export default class FilmPresenter {
     this.#filmPopupComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#filmPopupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#filmPopupComponent.setCommentDeleteClickHandler(this.#handleCommentDeleteClick);
+    this.#filmPopupComponent.setCommentAddHandler(this.#handleCommentAdd);
 
     if (prevFilmCardComponent === null && prevPopupComponent === null) {
       render(this.#filmCardComponent, this.#filmListContainer);
@@ -78,6 +79,10 @@ export default class FilmPresenter {
   partialDestroy = () => {
     remove(this.#filmCardComponent);
   };
+
+  #getCommentsByFilm() {
+    return this.#commentsModel.comments.filter((comment) => this.#film.comments.includes(comment.id));
+  }
 
   #showFilmDetail = () => {
     if (this.#mode === Mode.DEFAULT) {
@@ -137,7 +142,6 @@ export default class FilmPresenter {
   };
 
   #handleCommentDeleteClick = (commentId) => {
-    console.log('Удаляем в презентере комментарий: ', commentId );
     this.#commentsModel.deleteComment(
       UpdateType.MINOR,
       commentId
@@ -147,6 +151,19 @@ export default class FilmPresenter {
       UserAction.DELETE_COMMENT,
       UpdateType.MINOR,
       {...this.#film, comments: this.#film.comments.filter((filmCommentId) => filmCommentId !== commentId)}
+    );
+  };
+
+  #handleCommentAdd = (update) => {
+    this.#commentsModel.addComment(
+      UpdateType.MINOR,
+      update
+    );
+
+    this.#changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.MINOR,
+      {...this.#film, comments: [...this.#film.comments, update.id]}
     );
   };
 
