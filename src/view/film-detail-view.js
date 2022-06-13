@@ -108,7 +108,7 @@ const createFilmDetailTemplate = (film, commentsList) => {
                       <p class="film-details__comment-info">
                         <span class="film-details__comment-author">${it.author}</span>
                         <span class="film-details__comment-day">${humanizeDate(it.date)}</span>
-                        <button class="film-details__comment-delete">Delete</button>
+                        <button class="film-details__comment-delete" data-target-comment="${it.id}">Delete</button>
                       </p>
                     </div>
                   </li>
@@ -166,11 +166,20 @@ export default class FilmDetailView extends AbstractStatefulView {
   static parseStateToFilm = (state) => ({...state});
 
   reset = (film) => {
-    console.log(this);
-
     this.updateElement(
       FilmDetailView.parseFilmToState(film),
     );
+  };
+
+  setCommentDeleteClickHandler = (callback) => {
+    this._callback.commentDeleteClick = callback;
+    this.element.querySelectorAll('.film-details__comment-delete').forEach((element) => element.addEventListener('click', this.#commentDeleteClickHandler));
+  };
+
+  #commentDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    console.log('Удаление комментария вo view', evt.target.dataset.targetComment);
+    this._callback.commentDeleteClick(+evt.target.dataset.targetComment);
   };
 
   setWatchlistClickHandler = (callback) => {
@@ -199,6 +208,7 @@ export default class FilmDetailView extends AbstractStatefulView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
     this.setWatchedClickHandler(this._callback.watchedClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.setCommentDeleteClickHandler(this._callback.commentDeleteClick);
   };
 
   #restorePosition = () => {

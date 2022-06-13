@@ -5,21 +5,23 @@ import {UserAction, UpdateType, Mode, IS_PRESSED_ESCAPE_KEY} from '../const.js';
 
 export default class FilmPresenter {
   #filmListContainer = null;
+  #pageBodyElement = null;
+  #commentsModel = null;
   #changeData = null;
   #changeMode = null;
 
   #filmCardComponent = null;
   #filmPopupComponent = null;
-  #pageBodyElement = null;
 
   #film = null;
   #comments = null;
   #mode = Mode.DEFAULT;
   #scrollTopPopup = null;
 
-  constructor(filmListContainer, pageBodyElement, changeData, changeMode) {
+  constructor(filmListContainer, pageBodyElement, commentsModel, changeData, changeMode) {
     this.#filmListContainer = filmListContainer;
     this.#pageBodyElement = pageBodyElement;
+    this.#commentsModel = commentsModel;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
   }
@@ -47,6 +49,7 @@ export default class FilmPresenter {
     this.#filmPopupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#filmPopupComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#filmPopupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+    this.#filmPopupComponent.setCommentDeleteClickHandler(this.#handleCommentDeleteClick);
 
     if (prevFilmCardComponent === null && prevPopupComponent === null) {
       render(this.#filmCardComponent, this.#filmListContainer);
@@ -130,6 +133,20 @@ export default class FilmPresenter {
       UserAction.UPDATE_FILM,
       UpdateType.MINOR,
       {...this.#film, userDetails: {...this.#film.userDetails, favorite: !this.#film.userDetails.favorite}}
+    );
+  };
+
+  #handleCommentDeleteClick = (commentId) => {
+    console.log('Удаляем в презентере комментарий: ', commentId );
+    this.#commentsModel.deleteComment(
+      UpdateType.MINOR,
+      commentId
+    );
+
+    this.#changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.MINOR,
+      {...this.#film, comments: this.#film.comments.filter((filmCommentId) => filmCommentId !== commentId)}
     );
   };
 

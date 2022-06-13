@@ -104,11 +104,11 @@ export default class BoardPresenter {
       case UserAction.UPDATE_FILM:
         this.#filmsModel.updateFilm(updateType, update);
         break;
+      case UserAction.DELETE_COMMENT:
+        this.#filmsModel.updateFilm(updateType, update);
+        break;
       // case UserAction.ADD_COMMENT:
       //   this.#filmsModel.addFilm(updateType, update);
-      //   break;
-      // case UserAction.DELETE_COMMENT:
-      //   this.#filmsModel.deleteFilm(updateType, update);
       //   break;
     }
   };
@@ -136,7 +136,7 @@ export default class BoardPresenter {
   };
 
   #renderFilm = (film, container) => {
-    const filmPresenter = new FilmPresenter(container, this.#pageBodyElement, this.#handleViewAction, this.#handleModeChange);
+    const filmPresenter = new FilmPresenter(container, this.#pageBodyElement, this.#commentsModel, this.#handleViewAction, this.#handleModeChange);
 
     filmPresenter.init(film, this.#getFilmComments(film));
 
