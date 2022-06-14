@@ -1,7 +1,7 @@
 import {render, remove} from '../framework/render.js';
 import {SortType, FilterType, UpdateType, UserAction, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
 import {sortFilmsByDate, sortFilmsByRating} from '../utils/film.js';
-import {filter} from '../utils/filter.js';
+import {filterFilms} from '../utils/filter.js';
 import SortView from '../view/sort-view.js';
 import FilmsView from '../view/films-view.js';
 import FilmsListView from '../view/films-list-view.js';
@@ -52,9 +52,9 @@ export default class BoardPresenter {
   }
 
   get films() {
-    this.#filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filmsFilter;
     const films = this.#filmsModel.films;
-    const filteredFilms = filter[this.#filterType](films);
+    const filteredFilms = filterFilms[this.#filterType](films);
 
     switch (this.#currentSortType) {
       case SortType.DATE:
@@ -174,16 +174,13 @@ export default class BoardPresenter {
     remove(this.#filmsListTopRatedComponent);
     remove(this.#filmsContainerTopRatedComponent);
 
+    this.#renderedFilmCount = resetRenderedFilmsCount
+      ? FILM_COUNT_PER_STEP
+      : Math.min(filmsCount, this.#renderedFilmCount);
 
-    if (resetRenderedFilmsCount) {
-      this.#renderedFilmCount = FILM_COUNT_PER_STEP;
-    } else {
-      this.#renderedFilmCount = Math.min(filmsCount, this.#renderedFilmCount);
-    }
-
-    if (resetSortType) {
-      this.#currentSortType = SortType.DEFAULT;
-    }
+    this.#currentSortType = resetSortType
+      ? SortType.DEFAULT
+      : this.#currentSortType;
   };
 
   #renderMostCommentedList = () => {
