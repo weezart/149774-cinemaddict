@@ -1,29 +1,41 @@
-import {render, remove, replace, RenderPosition} from '../framework/render.js';
+import {render, remove, replace} from '../framework/render.js';
 import FilmCardView from '../view/film-card-view.js';
 import FilmDetailView from '../view/film-detail-view.js';
-import {IS_PRESSED_ESCAPE_KEY} from '../const.js';
-
+import {UserAction, UpdateType, Mode, IS_PRESSED_ESCAPE_KEY} from '../const.js';
 
 export default class FilmPresenter {
   #filmListContainer = null;
+  #pageBodyElement = null;
+  #commentsModel = null;
   #changeData = null;
+  #changeMode = null;
 
   #filmCardComponent = null;
   #filmPopupComponent = null;
 
   #film = null;
   #comments = null;
+  #mode = Mode.DEFAULT;
+  #scrollTopPopup = null;
 
-  constructor(filmListContainer, changeData) {
+  constructor(filmListContainer, pageBodyElement, commentsModel, changeData, changeMode) {
     this.#filmListContainer = filmListContainer;
+    this.#pageBodyElement = pageBodyElement;
+    this.#commentsModel = commentsModel;
     this.#changeData = changeData;
+    this.#changeMode = changeMode;
   }
 
-  init = (film, comments) => {
+  get film() {
+    return this.#film;
+  }
+
+  init = (film) => {
     this.#film = film;
-    this.#comments = comments;
+    this.#comments = this.#getCommentsByFilm();
 
     const prevFilmCardComponent = this.#filmCardComponent;
+    const prevPopupComponent =  this.#filmPopupComponent;
 
     this.#filmCardComponent = new FilmCardView(film);
     this.#filmPopupComponent = new FilmDetailView(this.#film, this.#comments);
@@ -37,8 +49,10 @@ export default class FilmPresenter {
     this.#filmPopupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#filmPopupComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#filmPopupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+    this.#filmPopupComponent.setCommentDeleteClickHandler(this.#handleCommentDeleteClick);
+    this.#filmPopupComponent.setCommentAddHandler(this.#handleCommentAdd);
 
-    if (prevFilmCardComponent === null) {
+    if (prevFilmCardComponent === null && prevPopupComponent === null) {
       render(this.#filmCardComponent, this.#filmListContainer);
       return;
     }
@@ -48,6 +62,13 @@ export default class FilmPresenter {
     }
 
     remove(prevFilmCardComponent);
+
+    if (this.#mode === Mode.OPENED) {
+      this.#scrollTopPopup = prevPopupComponent.element.scrollTop;
+      replace(this.#filmPopupComponent, prevPopupComponent);
+      this.#filmPopupComponent.element.scrollTop = this.#scrollTopPopup;
+      remove(prevPopupComponent);
+    }
   };
 
   destroy = () => {
@@ -55,21 +76,30 @@ export default class FilmPresenter {
     remove(this.#filmPopupComponent);
   };
 
-  #showFilmDetail = () => {
-    const footerElement = document.querySelector('.footer');
+  partialDestroy = () => {
+    remove(this.#filmCardComponent);
+  };
 
-    render(this.#filmPopupComponent, footerElement, RenderPosition.AFTEREND);
-    document.body.addEventListener('keydown', this.#escKeyDownHandler);
-    document.body.classList.add('hide-overflow');
+  #getCommentsByFilm() {
+    return this.#commentsModel.comments.filter((comment) => this.#film.comments.includes(comment.id));
+  }
+
+  #showFilmDetail = () => {
+    if (this.#mode === Mode.DEFAULT) {
+      render(this.#filmPopupComponent, this.#pageBodyElement);
+      document.addEventListener('keydown', this.#escKeyDownHandler);
+      this.#changeMode();
+      this.#mode = Mode.OPENED;
+      this.#pageBodyElement.classList.add('hide-overflow');
+    }
   };
 
   #hideFilmDetail = () => {
-    document.body.classList.remove('hide-overflow');
-    document.body.removeEventListener('keydown', this.#escKeyDownHandler);
-    if (document.querySelector('.film-details')) {
-      this.#filmPopupComponent.reset(this.#film);
-      document.querySelector('.film-details').remove();
-    }
+    this.#mode = Mode.DEFAULT;
+    this.#filmPopupComponent.reset(this.#film);
+    this.#filmPopupComponent.element.remove();
+    this.#pageBodyElement.classList.remove('hide-overflow');
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
   #escKeyDownHandler = (evt) => {
@@ -88,14 +118,60 @@ export default class FilmPresenter {
   };
 
   #handleWatchlistClick = () => {
-    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, watchlist: !this.#film.userDetails.watchlist}});
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      {...this.#film, userDetails: {...this.#film.userDetails, watchlist: !this.#film.userDetails.watchlist}}
+    );
   };
 
   #handleWatchedClick = () => {
-    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, alreadyWatched: !this.#film.userDetails.alreadyWatched}});
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      {...this.#film, userDetails: {...this.#film.userDetails, alreadyWatched: !this.#film.userDetails.alreadyWatched}}
+    );
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, favorite: !this.#film.userDetails.favorite}});
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      {...this.#film, userDetails: {...this.#film.userDetails, favorite: !this.#film.userDetails.favorite}}
+    );
   };
+
+  #handleCommentDeleteClick = (commentId) => {
+    this.#commentsModel.deleteComment(
+      UpdateType.MINOR,
+      commentId
+    );
+
+    this.#changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.MINOR,
+      {...this.#film, comments: this.#film.comments.filter((filmCommentId) => filmCommentId !== commentId)}
+    );
+  };
+
+  #handleCommentAdd = (update) => {
+    this.#commentsModel.addComment(
+      UpdateType.MINOR,
+      update
+    );
+
+    this.#changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.MINOR,
+      {...this.#film, comments: [...this.#film.comments, update.id]}
+    );
+  };
+
+  resetView = () => {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#hideFilmDetail();
+    }
+  };
+
+  isOpen = () => this.#mode === Mode.OPENED;
 }

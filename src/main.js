@@ -1,21 +1,25 @@
 import ProfileView from './view/profile-view.js';
 import StatsView from './view/stats-view.js';
-import FiltersView from './view/filters-view.js';
 import {render} from './framework/render.js';
-import FilmsPresenter from './presenter/films-presenter.js';
+import BoardPresenter from './presenter/board-presenter';
+import FilterPresenter from './presenter/filter-presenter.js';
 import FilmsModel from './model/film-model.js';
-import {generateFilter} from './mock/filter.js';
+import CommentsModel from './model/comment-model.js';
+import FilterModel from './model/filter-model.js';
 
+const siteBodyElement = document.querySelector('body');
 const siteMainElement = document.querySelector('.main');
 const siteHeaderElement = document.querySelector('.header');
 
 const footerStatsElement = document.querySelector('.footer__statistics');
 const filmsModel = new FilmsModel();
-const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel);
-const filters = generateFilter(filmsModel.films);
+const commentsModel = new CommentsModel();
+const filterModel = new FilterModel();
+const boardPresenter = new BoardPresenter(siteMainElement, siteBodyElement, filmsModel, commentsModel, filterModel);
+const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
 
 render(new ProfileView(), siteHeaderElement);
 render(new StatsView(), footerStatsElement);
-render(new FiltersView(filters), siteMainElement);
 
-filmsPresenter.init();
+filterPresenter.init();
+boardPresenter.init();

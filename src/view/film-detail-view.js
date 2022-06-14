@@ -1,6 +1,9 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import he from 'he';
 import {COMMENT_EMOTIONS} from '../const.js';
+import { nanoid } from 'nanoid';
 import {getDuration, humanizeDate} from '../utils/film.js';
+import {generateDate} from '../utils/common.js';
 
 const createFilmDetailTemplate = (film, commentsList) => {
   const { id, comments, filmInfo, userDetails } = film;
@@ -104,11 +107,11 @@ const createFilmDetailTemplate = (film, commentsList) => {
                       <img src="./images/emoji/${it.emotion}.png" width="55" height="55" alt="emoji-${it.emotion}">
                     </span>
                     <div>
-                      <p class="film-details__comment-text">${it.comment}</p>
+                      <p class="film-details__comment-text">${he.encode(it.comment)}</p>
                       <p class="film-details__comment-info">
                         <span class="film-details__comment-author">${it.author}</span>
                         <span class="film-details__comment-day">${humanizeDate(it.date)}</span>
-                        <button class="film-details__comment-delete">Delete</button>
+                        <button class="film-details__comment-delete" data-target-comment="${it.id}">Delete</button>
                       </p>
                     </div>
                   </li>
@@ -171,6 +174,34 @@ export default class FilmDetailView extends AbstractStatefulView {
     );
   };
 
+  setCommentDeleteClickHandler = (callback) => {
+    this._callback.commentDeleteClick = callback;
+    this.element.querySelectorAll('.film-details__comment-delete').forEach((element) => element.addEventListener('click', this.#commentDeleteClickHandler));
+  };
+
+  #commentDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.commentDeleteClick(+evt.target.dataset.targetComment);
+  };
+
+  setCommentAddHandler = (callback) => {
+    this._callback.commentAdd = callback;
+    this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#commentAddHandler);
+  };
+
+  #commentAddHandler = (evt) => {
+    if ((evt.ctrlKey || evt.metaKey) && evt.keyCode === 13 && this._state.commentEmoji) {
+      this._callback.commentAdd({
+        id: nanoid(),
+        author: 'Movie Buff',
+        comment: this._state.commentText,
+        emotion: this._state.commentEmoji,
+        date: generateDate(),
+      });
+    }
+  };
+
+
   setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);
@@ -197,6 +228,8 @@ export default class FilmDetailView extends AbstractStatefulView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
     this.setWatchedClickHandler(this._callback.watchedClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.setCommentDeleteClickHandler(this._callback.commentDeleteClick);
+    this.setCommentAddHandler(this._callback.commentAdd);
   };
 
   #restorePosition = () => {
