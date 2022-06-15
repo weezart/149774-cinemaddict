@@ -10,6 +10,7 @@ import FilmsListMostCommentedView from '../view/films-list-most-commented-view.j
 import FilmsContainer from '../view/films-container-view.js';
 import LoadMoreButtonView from '../view/load-more-button-view.js';
 import NoFilmsView from '../view/no-films-view';
+import LoadingView from '../view/loading-view.js';
 import FilmPresenter from './film-presenter.js';
 
 
@@ -33,12 +34,14 @@ export default class BoardPresenter {
   #filmsListComponent = new FilmsListView();
   #filmsListTopRatedComponent = new FilmsListTopRatedView();
   #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
+  #loadingComponent = new LoadingView();
   #filmsContainerComponent = new FilmsContainer();
   #filmsContainerTopRatedComponent = new FilmsContainer();
   #filmsContainerMostCommentedComponent = new FilmsContainer();
 
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
+  #isLoading = true;
 
   constructor(boardContainer, pageBodyElement, filmsModel, commentsModel, filterModel) {
     this.#boardContainer = boardContainer;
@@ -105,6 +108,11 @@ export default class BoardPresenter {
         break;
       case UserAction.ADD_COMMENT:
         this.#filmsModel.updateFilm(updateType, update);
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
         break;
     }
   };
@@ -173,6 +181,7 @@ export default class BoardPresenter {
     remove(this.#filmsContainerMostCommentedComponent);
     remove(this.#filmsListTopRatedComponent);
     remove(this.#filmsContainerTopRatedComponent);
+    remove(this.#loadingComponent);
 
     this.#renderedFilmCount = resetRenderedFilmsCount
       ? FILM_COUNT_PER_STEP
@@ -200,6 +209,10 @@ export default class BoardPresenter {
   #renderNoFilms = () => {
     this.#noFilmComponent = new NoFilmsView(this.#filterType);
     render(this.#noFilmComponent, this.#filmsComponent.element);
+  };
+
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#filmsComponent.element);
   };
 
   #renderLoadMoreButton = () => {
@@ -240,6 +253,8 @@ export default class BoardPresenter {
   };
 
   #renderBoard = () => {
+    render(this.#filmsComponent, this.#boardContainer);
+
     const films = this.films;
     const filmsCount = films.length;
 
@@ -247,7 +262,10 @@ export default class BoardPresenter {
       this.#renderSort();
     }
 
-    render(this.#filmsComponent, this.#boardContainer);
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
 
     if (filmsCount === 0) {
       this.#renderNoFilms();
