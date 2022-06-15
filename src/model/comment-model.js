@@ -5,25 +5,25 @@ export default class CommentsModel extends Observable {
   #commentsApiService = null;
   #comments =[];
 
-  constructor(commentsApiService) {
-    super();
-    this.#commentsApiService = commentsApiService;
-  }
+  // constructor(commentsApiService) {
+  //   super();
+  //   this.#commentsApiService = commentsApiService;
+  // }
 
   get comments () {
     return this.#comments;
   }
 
   init = async () => {
-    try {
-      const comments = await this.#commentsApiService.comments;
-      this.#comments = comments;
-    } catch(err) {
-      this.#comments = [];
-    }
+    // try {
+    //   const comments = await this.#commentsApiService.comments;
+    //   this.#comments = comments;
+    // } catch(err) {
+    //   this.#comments = [];
+    // }
 
 
-    this._notify(UpdateType.INIT);
+    //this._notify(UpdateType.INIT);
   };
 
   set comments(comments) {

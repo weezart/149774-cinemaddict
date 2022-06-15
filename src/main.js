@@ -18,7 +18,8 @@ const siteHeaderElement = document.querySelector('.header');
 
 const footerStatsElement = document.querySelector('.footer__statistics');
 const filmsModel = new FilmsModel(new FilmsApiService(END_POINT, AUTHORIZATION));
-const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION));
+//const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION));
+const commentsModel = new CommentsModel();
 const filterModel = new FilterModel();
 const boardPresenter = new BoardPresenter(siteMainElement, siteBodyElement, filmsModel, commentsModel, filterModel);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
@@ -28,5 +29,5 @@ render(new StatsView(), footerStatsElement);
 
 filterPresenter.init();
 boardPresenter.init();
-filmsModel.init();
-commentsModel.init();
+filmsModel.init().finally(() => {});
+//commentsModel.init();

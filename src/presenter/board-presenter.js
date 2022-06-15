@@ -109,11 +109,6 @@ export default class BoardPresenter {
       case UserAction.ADD_COMMENT:
         this.#filmsModel.updateFilm(updateType, update);
         break;
-      case UpdateType.INIT:
-        this.#isLoading = false;
-        remove(this.#loadingComponent);
-        this.#renderBoard();
-        break;
     }
   };
 
@@ -134,6 +129,11 @@ export default class BoardPresenter {
         break;
       case UpdateType.MAJOR:
         this.#clearBoard({resetRenderedFilmsCount: true, resetSortType: true});
+        this.#renderBoard();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderBoard();
         break;
     }
@@ -253,14 +253,14 @@ export default class BoardPresenter {
   };
 
   #renderBoard = () => {
-    render(this.#filmsComponent, this.#boardContainer);
-
     const films = this.films;
     const filmsCount = films.length;
 
     if (filmsCount !== 0) {
       this.#renderSort();
     }
+
+    render(this.#filmsComponent, this.#boardContainer);
 
     if (this.#isLoading) {
       this.#renderLoading();
