@@ -27,3 +27,4 @@ render(new StatsView(), footerStatsElement);
 
 filterPresenter.init();
 boardPresenter.init();
+filmsModel.init();
