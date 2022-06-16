@@ -3,6 +3,7 @@ import {SortType, FilterType, UpdateType, UserAction, FILM_COUNT_PER_STEP, EXTRA
 import {sortFilmsByDate, sortFilmsByRating} from '../utils/film.js';
 import {filterFilms} from '../utils/filter.js';
 import SortView from '../view/sort-view.js';
+import StatsView from '../view/stats-view.js';
 import FilmsView from '../view/films-view.js';
 import FilmsListView from '../view/films-list-view.js';
 import FilmsListTopRatedView from '../view/films-list-top-rated-view.js';
@@ -17,11 +18,13 @@ import FilmPresenter from './film-presenter.js';
 export default class BoardPresenter {
   #boardContainer = null;
   #pageBodyElement = null;
+  #footerStatsElement = null;
   #filmsModel = null;
   #commentsModel = null;
   #filterModel = null;
   #noFilmComponent = null;
   #sortComponent = null;
+  #footerStatsComponent = null;
   #loadMoreButtonComponent = null;
   #openFilmPresenter = null;
   #pagePosition = null;
@@ -43,9 +46,10 @@ export default class BoardPresenter {
   #filterType = FilterType.ALL;
   #isLoading = true;
 
-  constructor(boardContainer, pageBodyElement, filmsModel, commentsModel, filterModel) {
+  constructor(boardContainer, pageBodyElement, footerStatsElement, filmsModel, commentsModel, filterModel) {
     this.#boardContainer = boardContainer;
     this.#pageBodyElement = pageBodyElement;
+    this.#footerStatsElement = footerStatsElement;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
     this.#filterModel = filterModel;
@@ -134,6 +138,7 @@ export default class BoardPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
+        remove(this.#footerStatsComponent);
         this.#renderBoard();
         break;
     }
@@ -182,6 +187,7 @@ export default class BoardPresenter {
     remove(this.#filmsListTopRatedComponent);
     remove(this.#filmsContainerTopRatedComponent);
     remove(this.#loadingComponent);
+    remove(this.#footerStatsComponent);
 
     this.#renderedFilmCount = resetRenderedFilmsCount
       ? FILM_COUNT_PER_STEP
@@ -222,6 +228,12 @@ export default class BoardPresenter {
     render(this.#loadMoreButtonComponent, this.#filmsListComponent.element);
   };
 
+  #renderFooterStatsComponent = (filmsCount) => {
+    this.#footerStatsComponent = new StatsView(filmsCount);
+
+    render(this.#footerStatsComponent, this.#footerStatsElement);
+  };
+
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
@@ -255,6 +267,7 @@ export default class BoardPresenter {
   #renderBoard = () => {
     const films = this.films;
     const filmsCount = films.length;
+    this.#renderFooterStatsComponent(filmsCount);
 
     if (filmsCount !== 0) {
       this.#renderSort();

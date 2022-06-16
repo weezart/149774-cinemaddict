@@ -1,17 +1,18 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-const createStatsTemplate = () => (
-  `<section class="footer__statistics">
-    <p>130 291 movies inside</p>
-  </section>`
+const createStatsTemplate = (filmsCount) => (
+  `<p>${filmsCount} movies inside</p>`
 );
 
 export default class StatsView extends AbstractView {
-  constructor() {
+  #filmsCount = null;
+
+  constructor(filmsCount) {
     super();
+    this.#filmsCount = filmsCount;
   }
 
   get template() {
-    return createStatsTemplate();
+    return createStatsTemplate(this.#filmsCount);
   }
 }
