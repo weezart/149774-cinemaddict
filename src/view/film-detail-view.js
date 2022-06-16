@@ -3,7 +3,6 @@ import he from 'he';
 import {COMMENT_EMOTIONS} from '../const.js';
 import { nanoid } from 'nanoid';
 import {getDuration, humanizeDate} from '../utils/film.js';
-import {generateDate} from '../utils/common.js';
 
 const createFilmDetailTemplate = (film, commentsList) => {
   const { id, comments, filmInfo, userDetails } = film;
@@ -33,7 +32,7 @@ const createFilmDetailTemplate = (film, commentsList) => {
           </div>
           <div class="film-details__info-wrap">
             <div class="film-details__poster">
-              <img class="film-details__poster-img" src="./images/posters/${filmInfo.poster}" alt="">
+              <img class="film-details__poster-img" src="${filmInfo.poster}" alt="">
 
               <p class="film-details__age">${filmInfo.ageRating}+</p>
             </div>
@@ -196,7 +195,7 @@ export default class FilmDetailView extends AbstractStatefulView {
         author: 'Movie Buff',
         comment: this._state.commentText,
         emotion: this._state.commentEmoji,
-        date: generateDate(),
+        date: '',
       });
     }
   };

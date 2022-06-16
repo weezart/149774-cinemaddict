@@ -30,9 +30,9 @@ export default class FilmPresenter {
     return this.#film;
   }
 
-  init = (film) => {
+  init = async (film) => {
     this.#film = film;
-    this.#comments = this.#getCommentsByFilm();
+    this.#comments = await this.#commentsModel.init(this.#film).then(() => this.#commentsModel.comments);
 
     const prevFilmCardComponent = this.#filmCardComponent;
     const prevPopupComponent =  this.#filmPopupComponent;
@@ -79,10 +79,6 @@ export default class FilmPresenter {
   partialDestroy = () => {
     remove(this.#filmCardComponent);
   };
-
-  #getCommentsByFilm() {
-    return this.#commentsModel.comments.filter((comment) => this.#film.comments.includes(comment.id));
-  }
 
   #showFilmDetail = () => {
     if (this.#mode === Mode.DEFAULT) {

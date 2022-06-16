@@ -1,8 +1,4 @@
 import dayjs from 'dayjs';
-import {getRandomInteger} from './common.js';
-
-let counterComment = 0;
-const getIntegerArray = Array.from({length: 100}, () => counterComment++);
 
 const getDuration = (minutes) => {
   const hours = minutes / 60;
@@ -17,12 +13,6 @@ const getDuration = (minutes) => {
 const getFilmYear = (date) => dayjs(date).get('year');
 
 const humanizeDate = (date) => dayjs(date).format('YYYY/MM/DD HH:MM');
-
-const getRandomDay = (rangeType, min, max) => {
-  const daysGap = getRandomInteger(max, min);
-
-  return dayjs().add(daysGap, rangeType).toDate();
-};
 
 const getWeightForNull = (A, B) => {
   if (A === null && B === null) {
@@ -50,4 +40,4 @@ const sortFilmsByRating = (filmA, filmB) => {
   return weight ?? filmB.filmInfo.totalRating - filmA.filmInfo.totalRating;
 };
 
-export {getFilmYear, getDuration, humanizeDate, getRandomDay, getIntegerArray, sortFilmsByDate, sortFilmsByRating };
+export {getFilmYear, getDuration, humanizeDate, sortFilmsByDate, sortFilmsByRating };

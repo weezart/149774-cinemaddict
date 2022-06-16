@@ -1,12 +1,25 @@
 import Observable from '../framework/observable.js';
-import { generateComment } from '../mock/comment.js';
 
 export default class CommentsModel extends Observable {
-  #comments = Array.from({length: 1000}, generateComment);
+  #filmsApiService = null;
+  #comments =[];
+
+  constructor(filmsApiService) {
+    super();
+    this.#filmsApiService = filmsApiService;
+  }
 
   get comments () {
     return this.#comments;
   }
+
+  init = async (film) => {
+    try {
+      this.#comments = await this.#filmsApiService.getComments(film);
+    } catch (err) {
+      this.#comments = [];
+    }
+  };
 
   set comments(comments) {
     this.#comments = comments;
