@@ -195,7 +195,7 @@ export default class FilmDetailView extends AbstractStatefulView {
         author: 'Movie Buff',
         comment: this._state.commentText,
         emotion: this._state.commentEmoji,
-        date: generateDate(),
+        date: '',
       });
     }
   };
