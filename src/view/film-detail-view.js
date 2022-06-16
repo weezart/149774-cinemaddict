@@ -3,7 +3,6 @@ import he from 'he';
 import {COMMENT_EMOTIONS} from '../const.js';
 import { nanoid } from 'nanoid';
 import {getDuration, humanizeDate} from '../utils/film.js';
-import {generateDate} from '../utils/common.js';
 
 const createFilmDetailTemplate = (film, commentsList) => {
   const { id, comments, filmInfo, userDetails } = film;

@@ -68,8 +68,9 @@ export default class FilmsModel extends Observable {
     delete adaptedFilm.filmInfo.age_rating;
     delete adaptedFilm.filmInfo.alternative_title;
     delete adaptedFilm.filmInfo.total_rating;
+    delete adaptedFilm.filmInfo.release.release_country;
     delete adaptedFilm.userDetails.already_watched;
-    delete adaptedFilm.userDetails.watching_date
+    delete adaptedFilm.userDetails.watching_date;
 
     return adaptedFilm;
   };

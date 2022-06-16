@@ -7,7 +7,6 @@ import FilmsModel from './model/film-model.js';
 import CommentsModel from './model/comment-model.js';
 import FilterModel from './model/filter-model.js';
 import FilmsApiService from './films-api-service.js';
-import CommentsApiService from './comments-api-service.js';
 
 const AUTHORIZATION = 'Basic hXS2sgf404s4d4gwl1sd2wj';
 const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
@@ -18,8 +17,7 @@ const siteHeaderElement = document.querySelector('.header');
 
 const footerStatsElement = document.querySelector('.footer__statistics');
 const filmsModel = new FilmsModel(new FilmsApiService(END_POINT, AUTHORIZATION));
-//const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION));
-const commentsModel = new CommentsModel();
+const commentsModel = new CommentsModel(new FilmsApiService(END_POINT, AUTHORIZATION));
 const filterModel = new FilterModel();
 const boardPresenter = new BoardPresenter(siteMainElement, siteBodyElement, filmsModel, commentsModel, filterModel);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
@@ -29,5 +27,4 @@ render(new StatsView(), footerStatsElement);
 
 filterPresenter.init();
 boardPresenter.init();
-filmsModel.init().finally(() => {});
-//commentsModel.init();
+filmsModel.init();

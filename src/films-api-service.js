@@ -11,6 +11,8 @@ export default class FilmsApiService extends ApiService {
       .then(ApiService.parseResponse);
   }
 
+  getComments = (film) => this._load({url: `comments/${film.id}`}).then(ApiService.parseResponse);
+
   updateFilm = async (film) => {
     const response = await this._load({
       url: `movies/${film.id}`,
@@ -43,11 +45,11 @@ export default class FilmsApiService extends ApiService {
       }
     };
 
-    delete adaptedFilm.filmInfo.age_rating;
-    delete adaptedFilm.filmInfo.alternative_title;
-    delete adaptedFilm.filmInfo.total_rating;
-    delete adaptedFilm.userDetails.already_watched;
-    delete adaptedFilm.userDetails.watching_date
+    delete adaptedFilm.filmInfo.ageRating;
+    delete adaptedFilm.filmInfo.alternativeTitle;
+    delete adaptedFilm.filmInfo.totalRating;
+    delete adaptedFilm.userDetails.alreadyWatched;
+    delete adaptedFilm.userDetails.watchingDate;
 
     return adaptedFilm;
   };
