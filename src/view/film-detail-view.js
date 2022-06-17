@@ -1,7 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import he from 'he';
 import {COMMENT_EMOTIONS} from '../const.js';
-import { nanoid } from 'nanoid';
 import {getDuration, humanizeDate} from '../utils/film.js';
 
 const createFilmDetailTemplate = (film, commentsList) => {
@@ -191,11 +190,9 @@ export default class FilmDetailView extends AbstractStatefulView {
   #commentAddHandler = (evt) => {
     if ((evt.ctrlKey || evt.metaKey) && evt.keyCode === 13 && this._state.commentEmoji) {
       this._callback.commentAdd({
-        id: nanoid(),
         author: 'Movie Buff',
         comment: this._state.commentText,
         emotion: this._state.commentEmoji,
-        date: '',
       });
     }
   };

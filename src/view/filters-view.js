@@ -4,7 +4,7 @@ const createFiltersItemTemplate = (filter, currentFilterType) => {
   const {type, name, count} = filter;
 
   return (
-    `<a href="#${name.toLowerCase()}" data-filter-type="${name}" class="main-navigation__item ${name === currentFilterType ? 'main-navigation__item--active' : ''}">
+    `<a href="#${name.toLowerCase()}" data-filter-type="${type}" class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}">
       ${name} ${type !== 'All' ? `<span class="main-navigation__item-count">${count}</span>` : ''}
     </a>`
   );

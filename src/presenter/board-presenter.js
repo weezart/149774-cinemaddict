@@ -266,6 +266,7 @@ export default class BoardPresenter {
 
   #renderBoard = () => {
     const films = this.films;
+
     const filmsCount = films.length;
     this.#renderFooterStatsComponent(filmsCount);
 

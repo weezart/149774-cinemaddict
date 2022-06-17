@@ -14,7 +14,7 @@ export default class FilmPresenter {
   #filmPopupComponent = null;
 
   #film = null;
-  #comments = null;
+  #comments = [];
   #mode = Mode.DEFAULT;
   #scrollTopPopup = null;
 
@@ -30,9 +30,9 @@ export default class FilmPresenter {
     return this.#film;
   }
 
-  init = async (film) => {
+  init = (film) => {
     this.#film = film;
-    this.#comments = await this.#commentsModel.init(this.#film).then(() => this.#commentsModel.comments);
+    this.#getFilmComments();
 
     const prevFilmCardComponent = this.#filmCardComponent;
     const prevPopupComponent =  this.#filmPopupComponent;
@@ -69,6 +69,14 @@ export default class FilmPresenter {
       this.#filmPopupComponent.element.scrollTop = this.#scrollTopPopup;
       remove(prevPopupComponent);
     }
+  };
+
+  #getFilmComments = async () => {
+    this.#comments = await this.#commentsModel.init(this.#film).then(() => this.#commentsModel.comments);
+
+    // Есть проблема с предзагрузкой комментариев.
+
+    console.log(this.#comments);
   };
 
   destroy = () => {

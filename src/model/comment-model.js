@@ -2,7 +2,7 @@ import Observable from '../framework/observable.js';
 
 export default class CommentsModel extends Observable {
   #filmsApiService = null;
-  #comments =[];
+  #comments = [];
 
   constructor(filmsApiService) {
     super();
@@ -18,6 +18,7 @@ export default class CommentsModel extends Observable {
       this.#comments = await this.#filmsApiService.getComments(film);
     } catch (err) {
       this.#comments = [];
+      throw new Error('Can\'t get comments by film ID');
     }
   };
 
