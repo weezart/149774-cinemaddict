@@ -4,6 +4,7 @@ const Method = {
   GET: 'GET',
   PUT: 'PUT',
   DELETE: 'DELETE',
+  POST: 'POST'
 };
 
 export default class FilmsApiService extends ApiService {
@@ -21,6 +22,19 @@ export default class FilmsApiService extends ApiService {
     });
 
     return response;
+  };
+
+  addComment = async (filmId, comment) => {
+    const response = await this._load({
+      url: `comments/${filmId}`,
+      method: Method.POST,
+      body: JSON.stringify(comment),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    });
+
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
   };
 
   updateFilm = async (film) => {

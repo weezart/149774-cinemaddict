@@ -26,13 +26,15 @@ export default class CommentsModel extends Observable {
     }
   };
 
-  addComment = (updateType, update) => {
-    this.#comments = [
-      update,
-      ...this.#comments,
-    ];
-
-    this._notify(updateType, update);
+  addComment = async (updateType, filmId, update) => {
+    try {
+      const updatedData = await this.#filmsApiService.addComment(filmId, update);
+      this.#comments = updatedData.comments;
+      this._notify(updateType);
+      return updatedData.movie;
+    } catch {
+      throw new Error('Can\'t add comment');
+    }
   };
 
   deleteComment = async (updateType, comments, id) => {
@@ -49,6 +51,7 @@ export default class CommentsModel extends Observable {
         ...this.#comments.slice(0, index),
         ...this.#comments.slice(index + 1),
       ];
+      this._notify(updateType);
     } catch {
       throw new Error('Can\'t delete comment');
     }

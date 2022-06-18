@@ -95,7 +95,6 @@ export default class FilmCommentsView extends AbstractStatefulView {
   #commentAddHandler = (evt) => {
     if ((evt.ctrlKey || evt.metaKey) && evt.keyCode === 13 && this._state.commentEmoji) {
       this._callback.commentAdd({
-        author: 'Movie Buff',
         comment: this._state.commentText,
         emotion: this._state.commentEmoji,
       });

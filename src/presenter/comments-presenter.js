@@ -9,6 +9,7 @@ export default class FilmCommentsPresenter {
   #changeData = null;
   #film = null;
   #comments = null;
+  #updatedFilm = null;l
 
   constructor(commentsContainer, film, commentsModel, changeData) {
     this.#commentsContainer = commentsContainer;
@@ -55,16 +56,17 @@ export default class FilmCommentsPresenter {
     );
   };
 
-  #handleCommentAdd = (update) => {
-    this.#commentsModel.addComment(
+  #handleCommentAdd = async (update) => {
+    const updatedFilm = await this.#commentsModel.addComment(
       UpdateType.MINOR,
+      this.#film.id,
       update
     );
 
     this.#changeData(
       UserAction.ADD_COMMENT,
       UpdateType.MINOR,
-      {...this.#film, comments: [...this.#film.comments, update.id]}
+      { ...this.#film, comments: updatedFilm.comments }
     );
   };
 }
