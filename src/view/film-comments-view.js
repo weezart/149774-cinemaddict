@@ -84,7 +84,7 @@ export default class FilmCommentsView extends AbstractStatefulView {
 
   #commentDeleteClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.commentDeleteClick(+evt.target.dataset.targetComment);
+    this._callback.commentDeleteClick(evt.target.dataset.targetComment);
   };
 
   setCommentAddHandler = (callback) => {

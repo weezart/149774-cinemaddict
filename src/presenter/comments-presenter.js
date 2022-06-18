@@ -8,6 +8,7 @@ export default class FilmCommentsPresenter {
   #commentsModel = null;
   #changeData = null;
   #film = null;
+  #comments = null;
 
   constructor(commentsContainer, film, commentsModel, changeData) {
     this.#commentsContainer = commentsContainer;
@@ -21,9 +22,9 @@ export default class FilmCommentsPresenter {
   };
 
   init = async (film) => {
-    const comments = await this.#commentsModel.init(film).then(() => this.#commentsModel.comments);
+    this.#comments = await this.#commentsModel.init(film).then(() => this.#commentsModel.comments);
     const prevCommentsComponent = this.#commentsComponent;
-    this.#commentsComponent = new FilmCommentsView(film, comments);
+    this.#commentsComponent = new FilmCommentsView(film, this.#comments);
     this.#commentsComponent.setCommentDeleteClickHandler(this.#handleCommentDeleteClick);
     this.#commentsComponent.setCommentAddHandler(this.#handleCommentAdd);
     if (!prevCommentsComponent) {
@@ -43,6 +44,7 @@ export default class FilmCommentsPresenter {
   #handleCommentDeleteClick = (commentId) => {
     this.#commentsModel.deleteComment(
       UpdateType.MINOR,
+      this.#comments,
       commentId
     );
 
