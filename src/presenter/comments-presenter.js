@@ -53,6 +53,7 @@ export default class FilmCommentsPresenter {
   };
 
   setDeleting = () => {
+    console.log('Запуск удаления', this.#mode);
     if (this.#mode === Mode.EDITING) {
       this.#commentsComponent.updateElement({
         isDisabled: true,

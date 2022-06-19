@@ -108,9 +108,11 @@ export default class BoardPresenter {
     this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_FILM:
+        console.log(this.#filmPresenter.get(update.id));
         this.#filmsModel.updateFilm(updateType, update);
         break;
       case UserAction.DELETE_COMMENT:
+        this.#filmPresenter.get(update.id)[0].setDeleting();
         this.#filmsModel.updateFilm(updateType, update);
         break;
       case UserAction.ADD_COMMENT:
@@ -129,7 +131,7 @@ export default class BoardPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#filmPresenter.get(data.id).init(data);
+        this.#filmPresenter.get(data.id)[0].init(data);
         break;
       case UpdateType.MINOR:
         this.#clearBoard();

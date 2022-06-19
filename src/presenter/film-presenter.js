@@ -73,11 +73,11 @@ export default class FilmPresenter {
   };
 
   setSaving = () => {
-
+    this.#commentsPresenter.setSaving();
   };
 
   setDeleting = () => {
-    
+    this.#commentsPresenter.setDeleting();
   };
 
 

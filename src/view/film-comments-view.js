@@ -9,7 +9,7 @@ const createFilmListTemplate = (film, commentsList) => {
     : '';
 
   return (`
-    <div class="film-details__bottom-container">
+    <div class="film-details__bottom-container  ${film.isDeleting ? 'deleting' : ''}">
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsList.length}</span></h3>
         <ul class="film-details__comments-list">
@@ -23,7 +23,7 @@ const createFilmListTemplate = (film, commentsList) => {
                   <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${it.author}</span>
                     <span class="film-details__comment-day">${humanizeDate(it.date)}</span>
-                    <button class="film-details__comment-delete" data-target-comment="${it.id}">Delete</button>
+                    <button class="film-details__comment-delete" data-target-comment="${it.id}" ${film.isDisabled ? 'disabled' : ''}>Delete</button>
                   </p>
                 </div>
               </li>
@@ -35,7 +35,7 @@ const createFilmListTemplate = (film, commentsList) => {
               </div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.commentText ? film.commentText : ''}</textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${film.isDisabled ? 'disabled' : ''}>${film.commentText ? film.commentText : ''}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
@@ -74,6 +74,8 @@ export default class FilmCommentsView extends AbstractStatefulView {
     commentText: null,
     scrollTop: null,
     isDisabled: false,
+    isSaving: false,
+    isDeleting: false,
   });
 
   setCommentDeleteClickHandler = (callback) => {
@@ -89,6 +91,7 @@ export default class FilmCommentsView extends AbstractStatefulView {
       isDeleting: true,
     });
     evt.target.textContent = 'Deleting...';
+    evt.target.disabled = true;
     this._callback.commentDeleteClick(commentId);
   };
 
