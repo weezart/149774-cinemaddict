@@ -15,7 +15,7 @@ export default class FilmPresenter {
   #filmPopupComponent = null;
 
   #film = null;
-  #comments = null;
+  #commentsPresenter = null;
   #mode = Mode.DEFAULT;
   #scrollTopPopup = null;
 
@@ -39,8 +39,8 @@ export default class FilmPresenter {
 
     this.#filmCardComponent = new FilmCardView(film);
     this.#filmPopupComponent = new FilmDetailView(this.#film);
-    this.#comments = new CommentsPresenter(this.#filmPopupComponent.element, film, this.#commentsModel, this.#changeData);
-    this.#comments.init(film);
+    this.#commentsPresenter = new CommentsPresenter(this.#filmPopupComponent.element, film, this.#commentsModel, this.#changeData, this.#mode);
+    this.#commentsPresenter.init(film);
     this.#filmCardComponent.setClickHandler(this.#handleCardClick);
     this.#filmCardComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#filmCardComponent.setWatchedClickHandler(this.#handleWatchedClick);
@@ -68,7 +68,18 @@ export default class FilmPresenter {
       this.#filmPopupComponent.element.scrollTop = this.#scrollTopPopup;
       remove(prevPopupComponent);
     }
+
+
   };
+
+  setSaving = () => {
+
+  };
+
+  setDeleting = () => {
+    
+  };
+
 
   destroy = () => {
     remove(this.#filmCardComponent);
@@ -91,7 +102,7 @@ export default class FilmPresenter {
 
   #hideFilmDetail = () => {
     this.#mode = Mode.DEFAULT;
-    this.#comments.reset(this.#film);
+    this.#commentsPresenter.reset(this.#film);
     this.#filmPopupComponent.element.remove();
     this.#pageBodyElement.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#escKeyDownHandler);

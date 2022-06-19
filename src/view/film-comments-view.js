@@ -72,10 +72,9 @@ export default class FilmCommentsView extends AbstractStatefulView {
     ...film,
     commentEmoji: null,
     commentText: null,
-    scrollTop: null
+    scrollTop: null,
+    isDisabled: false,
   });
-
-  static parseStateToFilm = (state) => ({...state});
 
   setCommentDeleteClickHandler = (callback) => {
     this._callback.commentDeleteClick = callback;
@@ -84,7 +83,13 @@ export default class FilmCommentsView extends AbstractStatefulView {
 
   #commentDeleteClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.commentDeleteClick(evt.target.dataset.targetComment);
+    const commentId = evt.target.dataset.targetComment;
+    this.updateElement({
+      scrollTop: this.element.scrollTop,
+      isDeleting: true,
+    });
+    evt.target.textContent = 'Deleting...';
+    this._callback.commentDeleteClick(commentId);
   };
 
   setCommentAddHandler = (callback) => {

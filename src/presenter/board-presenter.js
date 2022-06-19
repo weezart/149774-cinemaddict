@@ -1,5 +1,6 @@
 import {render, remove} from '../framework/render.js';
-import {SortType, FilterType, UpdateType, UserAction, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import {SortType, FilterType, UpdateType, UserAction, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT, TimeLimit} from '../const.js';
 import {sortFilmsByDate, sortFilmsByRating} from '../utils/film.js';
 import {filterFilms} from '../utils/filter.js';
 import SortView from '../view/sort-view.js';
@@ -45,6 +46,7 @@ export default class BoardPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
   #isLoading = true;
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   constructor(boardContainer, pageBodyElement, footerStatsElement, filmsModel, commentsModel, filterModel) {
     this.#boardContainer = boardContainer;
@@ -103,6 +105,7 @@ export default class BoardPresenter {
   };
 
   #handleViewAction = (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this.#filmsModel.updateFilm(updateType, update);
@@ -114,6 +117,7 @@ export default class BoardPresenter {
         this.#filmsModel.updateFilm(updateType, update);
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModeChange = () => {

@@ -1,6 +1,6 @@
 import { remove, render, replace } from '../framework/render.js';
 import FilmCommentsView from '../view/film-comments-view.js';
-import {UpdateType, UserAction} from '../const.js';
+import {Mode, UpdateType, UserAction} from '../const.js';
 
 export default class FilmCommentsPresenter {
   #commentsContainer = null;
@@ -9,13 +9,14 @@ export default class FilmCommentsPresenter {
   #changeData = null;
   #film = null;
   #comments = null;
-  #updatedFilm = null;l
+  #mode = 'OPENED';
 
-  constructor(commentsContainer, film, commentsModel, changeData) {
+  constructor(commentsContainer, film, commentsModel, changeData, mode) {
     this.#commentsContainer = commentsContainer;
     this.#commentsModel = commentsModel;
     this.#changeData = changeData;
     this.#film = film;
+    this.#mode = mode;
   }
 
   destroy = () => {
@@ -40,6 +41,24 @@ export default class FilmCommentsPresenter {
 
   reset = (film) => {
     this.#commentsComponent.reset(film);
+  };
+
+  setSaving = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#commentsComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  };
+
+  setDeleting = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#commentsComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
   };
 
   #handleCommentDeleteClick = (commentId) => {
