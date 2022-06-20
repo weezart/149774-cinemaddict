@@ -3,6 +3,8 @@ import ApiService from './framework/api-service.js';
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  DELETE: 'DELETE',
+  POST: 'POST'
 };
 
 export default class FilmsApiService extends ApiService {
@@ -12,6 +14,28 @@ export default class FilmsApiService extends ApiService {
   }
 
   getComments = (film) => this._load({url: `comments/${film.id}`}).then(ApiService.parseResponse);
+
+  deleteComment = async (commentId) => {
+    const response = await this._load({
+      url: `comments/${commentId}`,
+      method: Method.DELETE
+    });
+
+    return response;
+  };
+
+  addComment = async (filmId, comment) => {
+    const response = await this._load({
+      url: `comments/${filmId}`,
+      method: Method.POST,
+      body: JSON.stringify(comment),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    });
+
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
+  };
 
   updateFilm = async (film) => {
     const response = await this._load({
@@ -30,26 +54,26 @@ export default class FilmsApiService extends ApiService {
     const adaptedFilm = {
       id: film.id,
       comments: film.comments,
-      filmInfo: {...film.film_info,
-        ageRating: film.film_info.age_rating,
-        alternativeTitle: film.film_info.alternative_title,
-        totalRating: film.film_info.total_rating,
+      'film_info': {...film.filmInfo,
+        'age_rating': film.filmInfo.ageRating,
+        'alternative_title': film.filmInfo.alternativeTitle,
+        'total_rating': film.filmInfo.totalRating,
         release: {
-          date: film.film_info.release.date !== null ? new Date(film.film_info.release.date) : film.film_info.release.date,
-          releaseCountry: film.film_info.release.release_country
+          date: film.filmInfo.release.date instanceof Date ? film.filmInfo.release.date.toISOString() : null,
+          'release_country': film.filmInfo.release.releaseCountry
         }
       },
-      userDetails: {...film.user_details,
-        alreadyWatched: film.user_details.already_watched,
-        watchingDate: film.user_details.watching_date !== null ? new Date(film.user_details.watching_date) : film.user_details.watching_date
+      'user_details': {...film.userDetails,
+        'already_watched': film.userDetails.alreadyWatched,
+        'watching_date': film.userDetails.watchingDate instanceof Date ? film.userDetails.watchingDate.toISOString() : null
       }
     };
 
-    delete adaptedFilm.filmInfo.ageRating;
-    delete adaptedFilm.filmInfo.alternativeTitle;
-    delete adaptedFilm.filmInfo.totalRating;
-    delete adaptedFilm.userDetails.alreadyWatched;
-    delete adaptedFilm.userDetails.watchingDate;
+    delete adaptedFilm.film_info.ageRating;
+    delete adaptedFilm.film_info.alternativeTitle;
+    delete adaptedFilm.film_info.totalRating;
+    delete adaptedFilm.user_details.alreadyWatched;
+    delete adaptedFilm.user_details.watchingDate;
 
     return adaptedFilm;
   };

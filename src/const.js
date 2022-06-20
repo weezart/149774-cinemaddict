@@ -37,3 +37,8 @@ export const Mode = {
   DEFAULT: 'DEFAULT',
   OPENED: 'OPENED',
 };
+
+export const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};

@@ -1,5 +1,4 @@
 import ProfileView from './view/profile-view.js';
-import StatsView from './view/stats-view.js';
 import {render} from './framework/render.js';
 import BoardPresenter from './presenter/board-presenter';
 import FilterPresenter from './presenter/filter-presenter.js';
@@ -14,16 +13,15 @@ const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 const siteBodyElement = document.querySelector('body');
 const siteMainElement = document.querySelector('.main');
 const siteHeaderElement = document.querySelector('.header');
-
 const footerStatsElement = document.querySelector('.footer__statistics');
+
 const filmsModel = new FilmsModel(new FilmsApiService(END_POINT, AUTHORIZATION));
 const commentsModel = new CommentsModel(new FilmsApiService(END_POINT, AUTHORIZATION));
 const filterModel = new FilterModel();
-const boardPresenter = new BoardPresenter(siteMainElement, siteBodyElement, filmsModel, commentsModel, filterModel);
+const boardPresenter = new BoardPresenter(siteMainElement, siteBodyElement, footerStatsElement, filmsModel, commentsModel, filterModel);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
 
 render(new ProfileView(), siteHeaderElement);
-render(new StatsView(), footerStatsElement);
 
 filterPresenter.init();
 boardPresenter.init();

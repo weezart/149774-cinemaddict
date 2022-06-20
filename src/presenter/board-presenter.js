@@ -1,8 +1,10 @@
 import {render, remove} from '../framework/render.js';
-import {SortType, FilterType, UpdateType, UserAction, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT} from '../const.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import {SortType, FilterType, UpdateType, UserAction, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT, TimeLimit} from '../const.js';
 import {sortFilmsByDate, sortFilmsByRating} from '../utils/film.js';
 import {filterFilms} from '../utils/filter.js';
 import SortView from '../view/sort-view.js';
+import StatsView from '../view/stats-view.js';
 import FilmsView from '../view/films-view.js';
 import FilmsListView from '../view/films-list-view.js';
 import FilmsListTopRatedView from '../view/films-list-top-rated-view.js';
@@ -17,11 +19,13 @@ import FilmPresenter from './film-presenter.js';
 export default class BoardPresenter {
   #boardContainer = null;
   #pageBodyElement = null;
+  #footerStatsElement = null;
   #filmsModel = null;
   #commentsModel = null;
   #filterModel = null;
   #noFilmComponent = null;
   #sortComponent = null;
+  #footerStatsComponent = null;
   #loadMoreButtonComponent = null;
   #openFilmPresenter = null;
   #pagePosition = null;
@@ -42,10 +46,12 @@ export default class BoardPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
   #isLoading = true;
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
-  constructor(boardContainer, pageBodyElement, filmsModel, commentsModel, filterModel) {
+  constructor(boardContainer, pageBodyElement, footerStatsElement, filmsModel, commentsModel, filterModel) {
     this.#boardContainer = boardContainer;
     this.#pageBodyElement = pageBodyElement;
+    this.#footerStatsElement = footerStatsElement;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
     this.#filterModel = filterModel;
@@ -98,30 +104,38 @@ export default class BoardPresenter {
     }
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this.#filmsModel.updateFilm(updateType, update);
+        try {
+          await this.#filmsModel.updateFilm(updateType, update);
+        } catch (err) {
+          this.#filmPresenter.get(update.id)[0].setAborting();
+        }
         break;
       case UserAction.DELETE_COMMENT:
-        this.#filmsModel.updateFilm(updateType, update);
+        try {
+          await this.#filmsModel.updateFilm(updateType, update);
+        } catch (err) {
+          this.#filmPresenter.get(update.id)[0].setAborting();
+        }
         break;
       case UserAction.ADD_COMMENT:
-        this.#filmsModel.updateFilm(updateType, update);
+        try {
+          await this.#filmsModel.updateFilm(updateType, update);
+        } catch (err) {
+          this.#filmPresenter.get(update.id)[0].setAborting();
+        }
         break;
     }
-  };
-
-  #handleModeChange = () => {
-    this.#filmPresenter
-      .forEach((value) => value
-        .forEach((presenter) => presenter.resetView()));
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#filmPresenter.get(data.id).init(data);
+        this.#filmPresenter.get(data.id)[0].init(data);
         break;
       case UpdateType.MINOR:
         this.#clearBoard();
@@ -134,13 +148,14 @@ export default class BoardPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
+        remove(this.#footerStatsComponent);
         this.#renderBoard();
         break;
     }
   };
 
   #renderFilm = (film, container) => {
-    const filmPresenter = new FilmPresenter(container, this.#pageBodyElement, this.#commentsModel, this.#handleViewAction, this.#handleModeChange);
+    const filmPresenter = new FilmPresenter(container, this.#pageBodyElement, this.#commentsModel, this.#handleViewAction);
 
     filmPresenter.init(film);
 
@@ -182,6 +197,7 @@ export default class BoardPresenter {
     remove(this.#filmsListTopRatedComponent);
     remove(this.#filmsContainerTopRatedComponent);
     remove(this.#loadingComponent);
+    remove(this.#footerStatsComponent);
 
     this.#renderedFilmCount = resetRenderedFilmsCount
       ? FILM_COUNT_PER_STEP
@@ -222,6 +238,12 @@ export default class BoardPresenter {
     render(this.#loadMoreButtonComponent, this.#filmsListComponent.element);
   };
 
+  #renderFooterStatsComponent = (filmsCount) => {
+    this.#footerStatsComponent = new StatsView(filmsCount);
+
+    render(this.#footerStatsComponent, this.#footerStatsElement);
+  };
+
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
@@ -254,7 +276,9 @@ export default class BoardPresenter {
 
   #renderBoard = () => {
     const films = this.films;
+
     const filmsCount = films.length;
+    this.#renderFooterStatsComponent(filmsCount);
 
     if (filmsCount !== 0) {
       this.#renderSort();
