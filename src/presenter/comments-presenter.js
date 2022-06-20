@@ -10,7 +10,7 @@ export default class FilmCommentsPresenter {
   #film = null;
   #comments = null;
 
-  constructor(commentsContainer, film, commentsModel, changeData, mode) {
+  constructor(commentsContainer, film, commentsModel, changeData) {
     this.#commentsContainer = commentsContainer;
     this.#commentsModel = commentsModel;
     this.#changeData = changeData;

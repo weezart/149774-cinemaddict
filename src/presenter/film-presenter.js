@@ -39,7 +39,7 @@ export default class FilmPresenter {
 
     this.#filmCardComponent = new FilmCardView(film);
     this.#filmPopupComponent = new FilmDetailView(this.#film);
-    this.#commentsPresenter = new CommentsPresenter(this.#filmPopupComponent.element, film, this.#commentsModel, this.#changeData, this.#mode);
+    this.#commentsPresenter = new CommentsPresenter(this.#filmPopupComponent.element, film, this.#commentsModel, this.#changeData);
     this.#commentsPresenter.init(film);
     this.#filmCardComponent.setClickHandler(this.#handleCardClick);
     this.#filmCardComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
