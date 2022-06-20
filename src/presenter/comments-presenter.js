@@ -1,6 +1,6 @@
 import { remove, render, replace } from '../framework/render.js';
 import FilmCommentsView from '../view/film-comments-view.js';
-import {Mode, UpdateType, UserAction} from '../const.js';
+import {UpdateType, UserAction} from '../const.js';
 
 export default class FilmCommentsPresenter {
   #commentsContainer = null;
@@ -9,14 +9,12 @@ export default class FilmCommentsPresenter {
   #changeData = null;
   #film = null;
   #comments = null;
-  #mode = 'OPENED';
 
   constructor(commentsContainer, film, commentsModel, changeData, mode) {
     this.#commentsContainer = commentsContainer;
     this.#commentsModel = commentsModel;
     this.#changeData = changeData;
     this.#film = film;
-    this.#mode = mode;
   }
 
   destroy = () => {
@@ -44,35 +42,31 @@ export default class FilmCommentsPresenter {
   };
 
   setSaving = () => {
-    if (this.#mode === Mode.EDITING) {
-      this.#commentsComponent.updateElement({
-        isDisabled: true,
-        isSaving: true,
-      });
-    }
+    this.#commentsComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
   };
 
   setDeleting = () => {
-    console.log('Запуск удаления', this.#mode);
-    if (this.#mode === Mode.EDITING) {
-      this.#commentsComponent.updateElement({
-        isDisabled: true,
-        isDeleting: true,
-      });
-    }
+    this.#commentsComponent.updateElement({
+      isDisabled: true,
+      isDeleting: true,
+    });
   };
 
   #handleCommentDeleteClick = (commentId) => {
-    this.#commentsModel.deleteComment(
-      UpdateType.MINOR,
-      this.#comments,
-      commentId
-    );
-
     this.#changeData(
       UserAction.DELETE_COMMENT,
-      UpdateType.MINOR,
-      {...this.#film, comments: this.#film.comments.filter((filmCommentId) => filmCommentId !== commentId)}
+      UpdateType.PATCH,
+      {
+        commentId: commentId,
+        comments: this.#comments,
+        updatedFilm: {
+          ...this.#film,
+          comments: this.#film.comments.filter((filmCommentId) => filmCommentId !== commentId)
+        }
+      }
     );
   };
 
@@ -85,7 +79,7 @@ export default class FilmCommentsPresenter {
 
     this.#changeData(
       UserAction.ADD_COMMENT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       { ...this.#film, comments: updatedFilm.comments }
     );
   };

@@ -23,7 +23,7 @@ const createFilmListTemplate = (film, commentsList) => {
                   <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${it.author}</span>
                     <span class="film-details__comment-day">${humanizeDate(it.date)}</span>
-                    <button class="film-details__comment-delete" data-target-comment="${it.id}" ${film.isDisabled ? 'disabled' : ''}>Delete</button>
+                    <button class="film-details__comment-delete" data-target-comment="${it.id}">Delete</button>
                   </p>
                 </div>
               </li>
@@ -90,8 +90,9 @@ export default class FilmCommentsView extends AbstractStatefulView {
       scrollTop: this.element.scrollTop,
       isDeleting: true,
     });
-    evt.target.textContent = 'Deleting...';
+    evt.target.innerHTML = 'Deleting...';
     evt.target.disabled = true;
+    this.#restorePosition();
     this._callback.commentDeleteClick(commentId);
   };
 

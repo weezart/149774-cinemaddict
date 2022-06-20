@@ -147,8 +147,20 @@ export default class FilmPresenter {
     );
   };
 
+  setAborting = () => {
+    const resetButtons = () => {
+      this.#filmCardComponent.updateElement({
+        isDisabled: false,
+      });
+    };
+    if (this.isOpen()) {
+      return this.#filmPopupComponent.setAborting();
+    }
+    this.#filmCardComponent.shake(resetButtons);
+  };
+
   resetView = () => {
-    if (this.#mode !== Mode.DEFAULT) {
+    if (this.isOpen()) {
       this.#hideFilmDetail();
     }
   };

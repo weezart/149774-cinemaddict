@@ -36,7 +36,6 @@ export const UpdateType = {
 export const Mode = {
   DEFAULT: 'DEFAULT',
   OPENED: 'OPENED',
-  EDITING: 'EDITING',
 };
 
 export const TimeLimit = {

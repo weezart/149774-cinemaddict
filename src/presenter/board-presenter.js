@@ -104,16 +104,24 @@ export default class BoardPresenter {
     }
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        console.log(this.#filmPresenter.get(update.id));
-        this.#filmsModel.updateFilm(updateType, update);
+        try {
+          await this.#filmsModel.updateFilm(updateType, update);
+        } catch (err) {
+          this.#filmPresenter.get(update.id)[0].setAborting();
+        }
         break;
       case UserAction.DELETE_COMMENT:
-        this.#filmPresenter.get(update.id)[0].setDeleting();
-        this.#filmsModel.updateFilm(updateType, update);
+        this.#filmPresenter.get(update.updatedFilm.id)[0].setDeleting();
+        try {
+          await this.#commentsModel.deleteComment(updateType, update.comments, update.commentId);
+          await this.#filmsModel.updateFilm(updateType, update.updatedFilm);
+        } catch (err) {
+          this.#filmPresenter.get(update.updatedFilm.id)[0].setAborting();
+        }
         break;
       case UserAction.ADD_COMMENT:
         this.#filmsModel.updateFilm(updateType, update);
