@@ -41,22 +41,31 @@ export default class FilmCommentsPresenter {
     this.#commentsComponent.reset(film);
   };
 
-  setSaving = () => {
+  setAdding = () => {
     this.#commentsComponent.updateElement({
       isDisabled: true,
-      isSaving: true,
+      isAdding: true,
     });
   };
 
-  setDeleting = () => {
+  setDeleting = (commentId) => {
+    // Возможно будет отдельный компонент для каджого
     this.#commentsComponent.updateElement({
       isDisabled: true,
       isDeleting: true,
     });
   };
 
-  #handleCommentDeleteClick = (commentId) => {
-    this.#changeData(
+  resetFormState = () => {
+    this.#commentsComponent.updateElement({
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    });
+  };
+
+  #handleCommentDeleteClick = async (commentId) => {
+    await this.#changeData(
       UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
       {

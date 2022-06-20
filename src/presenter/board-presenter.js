@@ -115,7 +115,7 @@ export default class BoardPresenter {
         }
         break;
       case UserAction.DELETE_COMMENT:
-        this.#filmPresenter.get(update.updatedFilm.id)[0].setDeleting();
+        this.#filmPresenter.get(update.updatedFilm.id)[0].setDeleting(update.commentId);
         try {
           await this.#commentsModel.deleteComment(updateType, update.comments, update.commentId);
           await this.#filmsModel.updateFilm(updateType, update.updatedFilm);
@@ -124,7 +124,12 @@ export default class BoardPresenter {
         }
         break;
       case UserAction.ADD_COMMENT:
-        this.#filmsModel.updateFilm(updateType, update);
+        this.#filmPresenter.get(update.id)[0].setAdding();
+        try {
+          await this.#filmsModel.updateFilm(updateType, update);
+        } catch (err) {
+          this.#filmPresenter.get(update.id)[0].setAborting();
+        }
         break;
     }
     this.#uiBlocker.unblock();

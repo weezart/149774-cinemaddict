@@ -72,14 +72,6 @@ export default class FilmPresenter {
 
   };
 
-  setSaving = () => {
-    this.#commentsPresenter.setSaving();
-  };
-
-  setDeleting = () => {
-    this.#commentsPresenter.setDeleting();
-  };
-
 
   destroy = () => {
     remove(this.#filmCardComponent);
@@ -147,16 +139,19 @@ export default class FilmPresenter {
     );
   };
 
+  setAdding = () => {
+    this.#commentsPresenter.setAdding();
+  };
+
+  setDeleting = (commentId) => {
+    this.#commentsPresenter.setDeleting(commentId);
+  };
+
   setAborting = () => {
-    const resetButtons = () => {
-      this.#filmCardComponent.updateElement({
-        isDisabled: false,
-      });
-    };
     if (this.isOpen()) {
-      return this.#filmPopupComponent.setAborting();
+      this.#filmPopupComponent.shake();
     }
-    this.#filmCardComponent.shake(resetButtons);
+    this.#filmCardComponent.shake();
   };
 
   resetView = () => {
