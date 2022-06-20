@@ -9,7 +9,6 @@ export default class FilmPresenter {
   #pageBodyElement = null;
   #commentsModel = null;
   #changeData = null;
-  #changeMode = null;
 
   #filmCardComponent = null;
   #filmPopupComponent = null;
@@ -19,12 +18,11 @@ export default class FilmPresenter {
   #mode = Mode.DEFAULT;
   #scrollTopPopup = null;
 
-  constructor(filmListContainer, pageBodyElement, commentsModel, changeData, changeMode) {
+  constructor(filmListContainer, pageBodyElement, commentsModel, changeData) {
     this.#filmListContainer = filmListContainer;
     this.#pageBodyElement = pageBodyElement;
     this.#commentsModel = commentsModel;
     this.#changeData = changeData;
-    this.#changeMode = changeMode;
   }
 
   get film() {
@@ -68,8 +66,6 @@ export default class FilmPresenter {
       this.#filmPopupComponent.element.scrollTop = this.#scrollTopPopup;
       remove(prevPopupComponent);
     }
-
-
   };
 
 
@@ -86,7 +82,6 @@ export default class FilmPresenter {
     if (this.#mode === Mode.DEFAULT) {
       render(this.#filmPopupComponent, this.#pageBodyElement);
       document.addEventListener('keydown', this.#escKeyDownHandler);
-      this.#changeMode();
       this.#mode = Mode.OPENED;
       this.#pageBodyElement.classList.add('hide-overflow');
     }
@@ -115,24 +110,24 @@ export default class FilmPresenter {
     this.#showFilmDetail();
   };
 
-  #handleWatchlistClick = () => {
-    this.#changeData(
+  #handleWatchlistClick = async () => {
+    await this.#changeData(
       UserAction.UPDATE_FILM,
       UpdateType.MINOR,
       {...this.#film, userDetails: {...this.#film.userDetails, watchlist: !this.#film.userDetails.watchlist}}
     );
   };
 
-  #handleWatchedClick = () => {
-    this.#changeData(
+  #handleWatchedClick = async () => {
+    await this.#changeData(
       UserAction.UPDATE_FILM,
       UpdateType.MINOR,
       {...this.#film, userDetails: {...this.#film.userDetails, alreadyWatched: !this.#film.userDetails.alreadyWatched}}
     );
   };
 
-  #handleFavoriteClick = () => {
-    this.#changeData(
+  #handleFavoriteClick = async () => {
+    await this.#changeData(
       UserAction.UPDATE_FILM,
       UpdateType.MINOR,
       {...this.#film, userDetails: {...this.#film.userDetails, favorite: !this.#film.userDetails.favorite}}

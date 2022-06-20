@@ -135,12 +135,6 @@ export default class BoardPresenter {
     this.#uiBlocker.unblock();
   };
 
-  #handleModeChange = () => {
-    this.#filmPresenter
-      .forEach((value) => value
-        .forEach((presenter) => presenter.resetView()));
-  };
-
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
@@ -164,7 +158,7 @@ export default class BoardPresenter {
   };
 
   #renderFilm = (film, container) => {
-    const filmPresenter = new FilmPresenter(container, this.#pageBodyElement, this.#commentsModel, this.#handleViewAction, this.#handleModeChange);
+    const filmPresenter = new FilmPresenter(container, this.#pageBodyElement, this.#commentsModel, this.#handleViewAction);
 
     filmPresenter.init(film);
 
