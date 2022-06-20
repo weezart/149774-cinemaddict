@@ -89,8 +89,6 @@ export default class FilmCommentsView extends AbstractStatefulView {
     const commentId = evt.target.dataset.targetComment;
     this.updateElement({
       scrollTop: this.element.scrollTop,
-      isDeleting: true,
-      deletingCommentId: commentId,
     });
     this._callback.commentDeleteClick(commentId);
   };
@@ -104,8 +102,6 @@ export default class FilmCommentsView extends AbstractStatefulView {
     if ((evt.ctrlKey || evt.metaKey) && evt.keyCode === 13 && this._state.commentEmoji) {
       this.updateElement({
         scrollTop: this.element.scrollTop,
-        isAdding: true,
-        isDisabled: true
       });
       this._callback.commentAdd({
         comment: this._state.commentText,

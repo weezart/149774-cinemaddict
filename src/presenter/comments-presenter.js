@@ -61,6 +61,7 @@ export default class FilmCommentsPresenter {
       isDisabled: false,
       isSaving: false,
       isDeleting: false,
+      deletingCommentId: null
     });
   };
 
