@@ -65,10 +65,11 @@ export default class FilmCommentsPresenter {
   };
 
   setAborting = () => {
-    this.#commentsComponent.shake();
+    this.#commentsComponent.shake(this.resetFormState);
   };
 
   #handleCommentDeleteClick = async (commentId) => {
+    this.setDeleting(commentId);
     try {
       await this.#commentsModel.deleteComment(
         UpdateType.MINOR,
@@ -87,6 +88,8 @@ export default class FilmCommentsPresenter {
   };
 
   #handleCommentAdd = async (update) => {
+    this.setAdding();
+
     try {
       const updatedFilm = await this.#commentsModel.addComment(
         UpdateType.MINOR,

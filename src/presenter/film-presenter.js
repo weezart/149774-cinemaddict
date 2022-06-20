@@ -144,7 +144,7 @@ export default class FilmPresenter {
 
   setAborting = () => {
     if (this.isOpen()) {
-      this.#filmPopupComponent.shake();
+      this.#commentsPresenter.setAborting();
     }
     this.#filmCardComponent.shake();
   };

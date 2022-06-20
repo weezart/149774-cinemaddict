@@ -23,7 +23,7 @@ const createFilmListTemplate = (film, commentsList) => {
                   <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${it.author}</span>
                     <span class="film-details__comment-day">${humanizeDate(it.date)}</span>
-                    <button class="film-details__comment-delete" data-target-comment="${it.id}">Delete</button>
+                    <button class="film-details__comment-delete" data-target-comment="${it.id}" ${film.isDisabled && film.deletingCommentId === it.id ? 'disabled' : ''}>${film.isDisabled && film.deletingCommentId === it.id ? 'Deleting...' : 'Delete'}</button>
                   </p>
                 </div>
               </li>
@@ -76,6 +76,7 @@ export default class FilmCommentsView extends AbstractStatefulView {
     isDisabled: false,
     isAdding: false,
     isDeleting: false,
+    deletingCommentId: null,
   });
 
   setCommentDeleteClickHandler = (callback) => {
@@ -89,9 +90,8 @@ export default class FilmCommentsView extends AbstractStatefulView {
     this.updateElement({
       scrollTop: this.element.scrollTop,
       isDeleting: true,
+      deletingCommentId: commentId,
     });
-    evt.target.textContent = 'Deleting...';
-    evt.target.disabled = true;
     this._callback.commentDeleteClick(commentId);
   };
 
