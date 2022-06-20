@@ -92,7 +92,6 @@ export default class FilmCommentsView extends AbstractStatefulView {
     });
     evt.target.textContent = 'Deleting...';
     evt.target.disabled = true;
-    this.#restorePosition();
     this._callback.commentDeleteClick(commentId);
   };
 

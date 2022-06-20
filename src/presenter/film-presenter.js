@@ -149,11 +149,5 @@ export default class FilmPresenter {
     this.#filmCardComponent.shake();
   };
 
-  resetView = () => {
-    if (this.isOpen()) {
-      this.#hideFilmDetail();
-    }
-  };
-
   isOpen = () => this.#mode === Mode.OPENED;
 }

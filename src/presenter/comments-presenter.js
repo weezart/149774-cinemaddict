@@ -49,10 +49,10 @@ export default class FilmCommentsPresenter {
   };
 
   setDeleting = (commentId) => {
-    // Возможно будет отдельный компонент для каджого
     this.#commentsComponent.updateElement({
       isDisabled: true,
       isDeleting: true,
+      deletingCommentId: commentId,
     });
   };
 
@@ -64,32 +64,43 @@ export default class FilmCommentsPresenter {
     });
   };
 
+  setAborting = () => {
+    this.#commentsComponent.shake();
+  };
+
   #handleCommentDeleteClick = async (commentId) => {
-    await this.#changeData(
-      UserAction.DELETE_COMMENT,
-      UpdateType.PATCH,
-      {
-        commentId: commentId,
-        comments: this.#comments,
-        updatedFilm: {
-          ...this.#film,
-          comments: this.#film.comments.filter((filmCommentId) => filmCommentId !== commentId)
-        }
-      }
-    );
+    try {
+      await this.#commentsModel.deleteComment(
+        UpdateType.MINOR,
+        this.#comments,
+        commentId
+      );
+
+      this.#changeData(
+        UserAction.DELETE_COMMENT,
+        UpdateType.MINOR,
+        {...this.#film, comments: this.#film.comments.filter((filmCommentId) => filmCommentId !== commentId)}
+      );
+    } catch {
+      this.setAborting();
+    }
   };
 
   #handleCommentAdd = async (update) => {
-    const updatedFilm = await this.#commentsModel.addComment(
-      UpdateType.MINOR,
-      this.#film.id,
-      update
-    );
+    try {
+      const updatedFilm = await this.#commentsModel.addComment(
+        UpdateType.MINOR,
+        this.#film.id,
+        update
+      );
 
-    this.#changeData(
-      UserAction.ADD_COMMENT,
-      UpdateType.PATCH,
-      { ...this.#film, comments: updatedFilm.comments }
-    );
+      this.#changeData(
+        UserAction.ADD_COMMENT,
+        UpdateType.PATCH,
+        { ...this.#film, comments: updatedFilm.comments }
+      );
+    } catch {
+      this.setAborting();
+    }
   };
 }
