@@ -3,7 +3,7 @@ import { humanizeDate } from '../utils/film.js';
 import he from 'he';
 import {COMMENT_EMOTIONS} from '../const.js';
 
-const createFilmListTemplate = (film, commentsList) => {
+const createFilmListTemplate = (film, commentsList, isDisabled) => {
   const commentEmojiTemplate = film.commentEmoji ?
     `<img src="images/emoji/${film.commentEmoji}.png" width="55" height="55" alt="emoji-${film.commentEmoji}}">`
     : '';
@@ -65,7 +65,7 @@ export default class FilmCommentsView extends AbstractStatefulView {
   }
 
   get template() {
-    return createFilmListTemplate(this._state, this.#comments);
+    return createFilmListTemplate(this._state, this.#comments, this.isDisabled);
   }
 
   static parseFilmToState = (film) => ({
@@ -90,7 +90,7 @@ export default class FilmCommentsView extends AbstractStatefulView {
       scrollTop: this.element.scrollTop,
       isDeleting: true,
     });
-    evt.target.innerHTML = 'Deleting...';
+    evt.target.textContent = 'Deleting...';
     evt.target.disabled = true;
     this.#restorePosition();
     this._callback.commentDeleteClick(commentId);
