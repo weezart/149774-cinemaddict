@@ -103,6 +103,11 @@ export default class FilmCommentsView extends AbstractStatefulView {
 
   #commentAddHandler = (evt) => {
     if ((evt.ctrlKey || evt.metaKey) && evt.keyCode === 13 && this._state.commentEmoji) {
+      this.updateElement({
+        scrollTop: this.element.scrollTop,
+        isAdding: true,
+        isDisabled: true
+      });
       this._callback.commentAdd({
         comment: this._state.commentText,
         emotion: this._state.commentEmoji,
