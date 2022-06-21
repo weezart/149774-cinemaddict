@@ -1,7 +1,8 @@
-import {render, remove} from '../framework/render.js';
+import {render, remove, replace} from '../framework/render.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import {SortType, FilterType, UpdateType, UserAction, FILM_COUNT_PER_STEP, EXTRA_FILM_COUNT, TimeLimit} from '../const.js';
 import {sortFilmsByDate, sortFilmsByRating} from '../utils/film.js';
+import { getFilteredMovies } from '../utils/filter.js';
 import {filterFilms} from '../utils/filter.js';
 import SortView from '../view/sort-view.js';
 import StatsView from '../view/stats-view.js';
@@ -13,12 +14,14 @@ import FilmsContainer from '../view/films-container-view.js';
 import LoadMoreButtonView from '../view/load-more-button-view.js';
 import NoFilmsView from '../view/no-films-view';
 import LoadingView from '../view/loading-view.js';
+import ProfileView from '../view/profile-view.js';
 import FilmPresenter from './film-presenter.js';
 
 
 export default class BoardPresenter {
   #boardContainer = null;
   #pageBodyElement = null;
+  #pageHeaderElement = null;
   #footerStatsElement = null;
   #filmsModel = null;
   #commentsModel = null;
@@ -29,6 +32,7 @@ export default class BoardPresenter {
   #loadMoreButtonComponent = null;
   #openFilmPresenter = null;
   #pagePosition = null;
+  #profileComponent = null;
 
   #renderedFilmCount = FILM_COUNT_PER_STEP;
 
@@ -48,9 +52,10 @@ export default class BoardPresenter {
   #isLoading = true;
   #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
-  constructor(boardContainer, pageBodyElement, footerStatsElement, filmsModel, commentsModel, filterModel) {
+  constructor(boardContainer, pageBodyElement, pageHeaderElement, footerStatsElement, filmsModel, commentsModel, filterModel) {
     this.#boardContainer = boardContainer;
     this.#pageBodyElement = pageBodyElement;
+    this.#pageHeaderElement = pageHeaderElement;
     this.#footerStatsElement = footerStatsElement;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
@@ -89,6 +94,21 @@ export default class BoardPresenter {
 
   init = () => {
     this.#renderBoard();
+  };
+
+  #renderProfile = () => {
+    const prevProfileComponent = this.#profileComponent;
+    const watchedFilmsCount = getFilteredMovies(FilterType.HISTORY, this.#filmsModel.films).length;
+
+    this.#profileComponent = new ProfileView(watchedFilmsCount);
+
+    if (prevProfileComponent === null) {
+      render(this.#profileComponent, this.#pageHeaderElement);
+      return;
+    }
+
+    replace(this.#profileComponent, prevProfileComponent);
+    remove(prevProfileComponent);
   };
 
   #handleLoadMoreButtonClick = () => {
@@ -275,9 +295,11 @@ export default class BoardPresenter {
   };
 
   #renderBoard = () => {
-    const films = this.films;
+    this.#renderProfile();
 
+    const films = this.films;
     const filmsCount = films.length;
+
     this.#renderFooterStatsComponent(filmsCount);
 
     if (filmsCount !== 0) {

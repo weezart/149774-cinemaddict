@@ -6,3 +6,5 @@ export const filterFilms = {
   [FilterType.HISTORY]: (films) => films.filter(({userDetails}) => userDetails.alreadyWatched),
   [FilterType.FAVORITES]: (films) => films.filter(({userDetails}) => userDetails.favorite)
 };
+
+export const getFilteredMovies = (filterType, films) => filterFilms[filterType](films);

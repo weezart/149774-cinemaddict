@@ -42,3 +42,17 @@ export const TimeLimit = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1000,
 };
+
+export const UserRankTitle = {
+  NONE: '',
+  NOVICE: 'Novice',
+  FAN: 'Fan',
+  MOVIE_BUFF: 'Movie Buff',
+};
+
+export const UserRankRequirement = {
+  NONE: 0,
+  NOVICE: 1,
+  FAN: 11,
+  MOVIE_BUFF: 21,
+};
