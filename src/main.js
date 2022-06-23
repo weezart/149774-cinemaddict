@@ -1,4 +1,3 @@
-import {render} from './framework/render.js';
 import BoardPresenter from './presenter/board-presenter';
 import FilterPresenter from './presenter/filter-presenter.js';
 import FilmsModel from './model/film-model.js';
