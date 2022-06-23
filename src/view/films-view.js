@@ -6,10 +6,6 @@ const createFilmsTemplate = () => (
 );
 
 export default class FilmsView extends AbstractView {
-  constructor() {
-    super();
-  }
-
   get template() {
     return createFilmsTemplate();
   }
