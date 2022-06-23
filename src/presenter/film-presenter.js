@@ -145,8 +145,18 @@ export default class FilmPresenter {
   setAborting = () => {
     if (this.isOpen()) {
       this.#commentPresenter.setAborting();
+      this.#filmPopupComponent.updateElement({
+        isDisabled: false,
+      });
+    } else {
+      this.#filmCardComponent.shake(this.resetFormState);
     }
-    this.#filmCardComponent.shake();
+  };
+
+  resetFormState = () => {
+    this.#filmCardComponent.updateElement({
+      isDisabled: false,
+    });
   };
 
   isOpen = () => this.#mode === Mode.OPENED;

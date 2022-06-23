@@ -83,9 +83,9 @@ const createFilmDetailTemplate = (film) => {
           </div>
 
           <section class="film-details__controls">
-            <button type="button" class="film-details__control-button film-details__control-button--watchlist ${watchlistClassName}" id="watchlist" name="watchlist">Add to watchlist</button>
-            <button type="button" class="film-details__control-button film-details__control-button--watched ${watchedClassName}" id="watched" name="watched">Already watched</button>
-            <button type="button" class="film-details__control-button film-details__control-button--favorite ${favoriteClassName}" id="favorite" name="favorite">Add to favorites</button>
+            <button type="button" class="film-details__control-button film-details__control-button--watchlist ${watchlistClassName}" id="watchlist" name="watchlist" ${film.isDisabled ? 'disabled' : ''}>Add to watchlist</button>
+            <button type="button" class="film-details__control-button film-details__control-button--watched ${watchedClassName}" id="watched" name="watched" ${film.isDisabled ? 'disabled' : ''}>Already watched</button>
+            <button type="button" class="film-details__control-button film-details__control-button--favorite ${favoriteClassName}" id="favorite" name="favorite" ${film.isDisabled ? 'disabled' : ''}>Add to favorites</button>
           </section>
         </div>
       </form>
@@ -94,16 +94,20 @@ const createFilmDetailTemplate = (film) => {
 };
 
 export default class FilmDetailView extends AbstractStatefulView {
-  #film = null;
-
   constructor(film) {
     super();
 
-    this.#film = film;
+    this._state = FilmDetailView.parseFilmToState(film);
   }
 
+  static parseFilmToState = (film) => ({
+    ...film,
+    scrollTop: null,
+    isDisabled: false,
+  });
+
   get template() {
-    return createFilmDetailTemplate(this.#film);
+    return createFilmDetailTemplate(this._state);
   }
 
   setWatchlistClickHandler = (callback) => {
@@ -135,16 +139,28 @@ export default class FilmDetailView extends AbstractStatefulView {
 
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
+    this.updateElement({
+      scrollTop: this.element.scrollTop,
+      isDisabled: true,
+    });
     this._callback.watchlistClick();
   };
 
   #watchedClickHandler = (evt) => {
     evt.preventDefault();
+    this.updateElement({
+      scrollTop: this.element.scrollTop,
+      isDisabled: true,
+    });
     this._callback.watchedClick();
   };
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
+    this.updateElement({
+      scrollTop: this.element.scrollTop,
+      isDisabled: true,
+    });
     this._callback.favoriteClick();
   };
 
