@@ -2,17 +2,17 @@ import { remove, render, replace } from '../framework/render.js';
 import FilmCommentsView from '../view/film-comments-view.js';
 import {UpdateType, UserAction} from '../const.js';
 
-export default class FilmCommentsPresenter {
+export default class FilmCommentPresenter {
   #commentsContainer = null;
   #commentsComponent = null;
-  #commentsModel = null;
+  #commentModel = null;
   #changeData = null;
   #film = null;
   #comments = null;
 
-  constructor(commentsContainer, film, commentsModel, changeData) {
+  constructor(commentsContainer, film, commentModel, changeData) {
     this.#commentsContainer = commentsContainer;
-    this.#commentsModel = commentsModel;
+    this.#commentModel = commentModel;
     this.#changeData = changeData;
     this.#film = film;
   }
@@ -22,7 +22,7 @@ export default class FilmCommentsPresenter {
   };
 
   init = async (film) => {
-    this.#comments = await this.#commentsModel.init(film).then(() => this.#commentsModel.comments);
+    this.#comments = await this.#commentModel.init(film).then(() => this.#commentModel.comments);
     const prevCommentsComponent = this.#commentsComponent;
     this.#commentsComponent = new FilmCommentsView(film, this.#comments);
     this.#commentsComponent.setCommentDeleteClickHandler(this.#handleCommentDeleteClick);
@@ -72,7 +72,7 @@ export default class FilmCommentsPresenter {
   #handleCommentDeleteClick = async (commentId) => {
     this.setDeleting(commentId);
     try {
-      await this.#commentsModel.deleteComment(
+      await this.#commentModel.deleteComment(
         UpdateType.MINOR,
         this.#comments,
         commentId
@@ -92,7 +92,7 @@ export default class FilmCommentsPresenter {
     this.setAdding();
 
     try {
-      const updatedFilm = await this.#commentsModel.addComment(
+      const updatedFilm = await this.#commentModel.addComment(
         UpdateType.MINOR,
         this.#film.id,
         update

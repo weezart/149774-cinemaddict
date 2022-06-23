@@ -1,7 +1,7 @@
 import Observable from '../framework/observable.js';
 import {UpdateType} from '../const.js';
 
-export default class FilmsModel extends Observable {
+export default class FilmModel extends Observable {
   #filmsApiService = null;
   #films = [];
 
