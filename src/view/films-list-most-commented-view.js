@@ -8,10 +8,6 @@ const createFilmsListMostCommentedTemplate = () => (
 );
 
 export default class FilmsListMostCommentedView extends AbstractView {
-  constructor() {
-    super();
-  }
-
   get template() {
     return createFilmsListMostCommentedTemplate();
   }

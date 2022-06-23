@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { humanizeDate } from '../utils/film.js';
+import { humanizeRelativeTime } from '../utils/film.js';
 import he from 'he';
 import {COMMENT_EMOTIONS} from '../const.js';
 
@@ -22,7 +22,7 @@ const createFilmListTemplate = (film, commentsList) => {
                   <p class="film-details__comment-text">${he.encode(it.comment)}</p>
                   <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${it.author}</span>
-                    <span class="film-details__comment-day">${humanizeDate(it.date)}</span>
+                    <span class="film-details__comment-day">${humanizeRelativeTime(it.date)}</span>
                     <button class="film-details__comment-delete" data-target-comment="${it.id}" ${film.isDisabled && film.deletingCommentId === it.id ? 'disabled' : ''}>${film.isDisabled && film.deletingCommentId === it.id ? 'Deleting...' : 'Delete'}</button>
                   </p>
                 </div>
