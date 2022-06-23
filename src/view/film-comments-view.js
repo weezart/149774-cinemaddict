@@ -9,7 +9,7 @@ const createFilmListTemplate = (film, commentsList) => {
     : '';
 
   return (`
-    <div class="film-details__bottom-container  ${film.isDeleting ? 'deleting' : ''}">
+    <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsList.length}</span></h3>
         <ul class="film-details__comments-list">
@@ -40,7 +40,7 @@ const createFilmListTemplate = (film, commentsList) => {
 
               <div class="film-details__emoji-list">
                 ${COMMENT_EMOTIONS.map((it) => `
-                  <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${it}" value="${it}">
+                  <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${it}" value="${it}"  ${film.isDisabled ? 'disabled' : ''}>
                   <label class="film-details__emoji-label" for="emoji-${it}">
                     <img src="./images/emoji/${it}.png" width="30" height="30" alt="emoji">
                   </label>

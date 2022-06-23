@@ -3,13 +3,9 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
 const getDuration = (minutes) => {
-  const hours = minutes / 60;
-  if (hours < 1) {
-    return `${minutes}m`;
-  } else if ((minutes % 60) === 0) {
-    return `${hours.toFixed(0)}h`;
-  }
-  return `${hours.toFixed(0)}h ${minutes % 60}m` ;
+  const textHours = minutes / 60 > 0 ? `${(minutes / 60).toFixed(0)}h` : '';
+  const textMinutes = minutes % 60 !== 0 ? `${minutes % 60}m` : '';
+  return `${textHours} ${textMinutes}`;
 };
 
 const getFilmYear = (date) => dayjs(date).get('year');
