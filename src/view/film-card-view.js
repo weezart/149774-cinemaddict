@@ -1,6 +1,5 @@
-import AbstractView from '../framework/view/abstract-view.js';
 import { getDuration, getFilmYear} from '../utils/film.js';
-import AbstractStatefulView from "../framework/view/abstract-stateful-view";
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 const createFilmCardTemplate = (film) => {
   const { id, comments, filmInfo, userDetails } = film;
