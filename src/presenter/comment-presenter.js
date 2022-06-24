@@ -65,6 +65,10 @@ export default class FilmCommentPresenter {
     });
   };
 
+  setCommentRemoveAborting = (commentId) => {
+    this.#commentsComponent.shakeComment(this.resetFormState, commentId);
+  };
+
   setAborting = () => {
     this.#commentsComponent.shake(this.resetFormState);
   };
@@ -84,7 +88,7 @@ export default class FilmCommentPresenter {
         {...this.#film, comments: this.#film.comments.filter((filmCommentId) => filmCommentId !== commentId)}
       );
     } catch {
-      this.setAborting();
+      this.setCommentRemoveAborting(commentId);
     }
   };
 

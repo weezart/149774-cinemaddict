@@ -142,12 +142,14 @@ export default class FilmPresenter {
     this.#commentPresenter.setDeleting(commentId);
   };
 
+  setPopupControlsAborting = () => {
+    this.#filmPopupComponent.shakeControls(this.#filmPopupComponent.resetFormState);
+  };
+
   setAborting = () => {
     if (this.isOpen()) {
       this.#commentPresenter.setAborting();
-      this.#filmPopupComponent.updateElement({
-        isDisabled: false,
-      });
+      this.setPopupControlsAborting();
     } else {
       this.#filmCardComponent.shake(this.resetFormState);
     }

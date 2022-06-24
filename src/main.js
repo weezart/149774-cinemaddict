@@ -7,7 +7,7 @@ import FilterModel from './model/filter-model.js';
 import FilmsApiService from './films-api-service.js';
 import StatsView from './view/stats-view.js';
 
-const AUTHORIZATION = 'Basic hXS2sgf404s4d4gwl1sd2wj';
+const AUTHORIZATION = 'Basic hXS2sgf405s4d4gwl1sd2wj';
 const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 
 const siteBodyElement = document.querySelector('body');

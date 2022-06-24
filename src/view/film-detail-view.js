@@ -1,5 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
+import {SHAKE_CLASS_NAME, SHAKE_ANIMATION_TIMEOUT} from '../const.js';
 import {getDuration, humanizeDate} from '../utils/film.js';
 
 const createFilmDetailTemplate = (film) => {
@@ -110,6 +111,10 @@ export default class FilmDetailView extends AbstractStatefulView {
     return createFilmDetailTemplate(this._state);
   }
 
+  get controls() {
+    return this.element.querySelector('.film-details__top-container');
+  }
+
   setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);
@@ -135,7 +140,22 @@ export default class FilmDetailView extends AbstractStatefulView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
     this.setWatchedClickHandler(this._callback.watchedClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.element.scrollTop = this._state.scrollTop;
   };
+
+  resetFormState = () => {
+    this.updateElement({
+      isDisabled: false,
+    });
+  };
+
+  shakeControls(callback) {
+    this.controls.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.controls.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
 
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
