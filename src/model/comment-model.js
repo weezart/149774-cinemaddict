@@ -1,6 +1,6 @@
 import Observable from '../framework/observable.js';
 
-export default class CommentsModel extends Observable {
+export default class CommentModel extends Observable {
   #filmsApiService = null;
   #comments = [];
 

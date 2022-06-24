@@ -56,3 +56,6 @@ export const UserRankRequirement = {
   FAN: 11,
   MOVIE_BUFF: 21,
 };
+
+export const SHAKE_CLASS_NAME = 'shake';
+export const SHAKE_ANIMATION_TIMEOUT = 600;

@@ -1,7 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeRelativeTime } from '../utils/film.js';
 import he from 'he';
-import {COMMENT_EMOTIONS} from '../const.js';
+import {COMMENT_EMOTIONS, SHAKE_ANIMATION_TIMEOUT, SHAKE_CLASS_NAME} from '../const.js';
 
 const createFilmListTemplate = (film, commentsList) => {
   const commentEmojiTemplate = film.commentEmoji ?
@@ -9,12 +9,12 @@ const createFilmListTemplate = (film, commentsList) => {
     : '';
 
   return (`
-    <div class="film-details__bottom-container  ${film.isDeleting ? 'deleting' : ''}">
+    <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsList.length}</span></h3>
         <ul class="film-details__comments-list">
            ${commentsList.map((it) => `
-              <li class="film-details__comment">
+              <li class="film-details__comment" id="comment_${it.id}">
                 <span class="film-details__comment-emoji">
                   <img src="./images/emoji/${it.emotion}.png" width="55" height="55" alt="emoji-${it.emotion}">
                 </span>
@@ -40,7 +40,7 @@ const createFilmListTemplate = (film, commentsList) => {
 
               <div class="film-details__emoji-list">
                 ${COMMENT_EMOTIONS.map((it) => `
-                  <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${it}" value="${it}">
+                  <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${it}" value="${it}"  ${film.isDisabled ? 'disabled' : ''}>
                   <label class="film-details__emoji-label" for="emoji-${it}">
                     <img src="./images/emoji/${it}.png" width="30" height="30" alt="emoji">
                   </label>
@@ -67,6 +67,8 @@ export default class FilmCommentsView extends AbstractStatefulView {
   get template() {
     return createFilmListTemplate(this._state, this.#comments);
   }
+
+  getDeletingComment = (id) => this.element.querySelector(`#comment_${id}`);
 
   static parseFilmToState = (film) => ({
     ...film,
@@ -114,6 +116,7 @@ export default class FilmCommentsView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setCommentDeleteClickHandler(this._callback.commentDeleteClick);
     this.setCommentAddHandler(this._callback.commentAdd);
+    this.element.scrollTop = this._state.scrollTop;
   };
 
   #restorePosition = () => {
@@ -149,6 +152,16 @@ export default class FilmCommentsView extends AbstractStatefulView {
     });
     this.#restorePosition();
   };
+
+  shakeComment(callback, commentId) {
+    const deletingComment = this.getDeletingComment(commentId);
+
+    deletingComment.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      deletingComment.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
 
   reset = (film) => {
     this.updateElement(

@@ -1,27 +1,27 @@
 import {render, remove, replace} from '../framework/render.js';
 import FilmCardView from '../view/film-card-view.js';
 import FilmDetailView from '../view/film-detail-view.js';
-import CommentsPresenter from './comments-presenter.js';
+import CommentPresenter from './comment-presenter.js';
 import {UserAction, UpdateType, Mode, IS_PRESSED_ESCAPE_KEY} from '../const.js';
 
 export default class FilmPresenter {
   #filmListContainer = null;
   #pageBodyElement = null;
-  #commentsModel = null;
+  #commentModel = null;
   #changeData = null;
 
   #filmCardComponent = null;
   #filmPopupComponent = null;
 
   #film = null;
-  #commentsPresenter = null;
+  #commentPresenter = null;
   #mode = Mode.DEFAULT;
   #scrollTopPopup = null;
 
-  constructor(filmListContainer, pageBodyElement, commentsModel, changeData) {
+  constructor(filmListContainer, pageBodyElement, commentModel, changeData) {
     this.#filmListContainer = filmListContainer;
     this.#pageBodyElement = pageBodyElement;
-    this.#commentsModel = commentsModel;
+    this.#commentModel = commentModel;
     this.#changeData = changeData;
   }
 
@@ -37,8 +37,8 @@ export default class FilmPresenter {
 
     this.#filmCardComponent = new FilmCardView(film);
     this.#filmPopupComponent = new FilmDetailView(this.#film);
-    this.#commentsPresenter = new CommentsPresenter(this.#filmPopupComponent.element, film, this.#commentsModel, this.#changeData);
-    this.#commentsPresenter.init(film);
+    this.#commentPresenter = new CommentPresenter(this.#filmPopupComponent.element, film, this.#commentModel, this.#changeData);
+    this.#commentPresenter.init(film);
     this.#filmCardComponent.setClickHandler(this.#handleCardClick);
     this.#filmCardComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#filmCardComponent.setWatchedClickHandler(this.#handleWatchedClick);
@@ -89,7 +89,7 @@ export default class FilmPresenter {
 
   #hideFilmDetail = () => {
     this.#mode = Mode.DEFAULT;
-    this.#commentsPresenter.reset(this.#film);
+    this.#commentPresenter.reset(this.#film);
     this.#filmPopupComponent.element.remove();
     this.#pageBodyElement.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#escKeyDownHandler);
@@ -135,18 +135,31 @@ export default class FilmPresenter {
   };
 
   setAdding = () => {
-    this.#commentsPresenter.setAdding();
+    this.#commentPresenter.setAdding();
   };
 
   setDeleting = (commentId) => {
-    this.#commentsPresenter.setDeleting(commentId);
+    this.#commentPresenter.setDeleting(commentId);
+  };
+
+  setPopupControlsAborting = () => {
+    this.#filmPopupComponent.shakeControls(this.#filmPopupComponent.resetFormState);
   };
 
   setAborting = () => {
     if (this.isOpen()) {
-      this.#commentsPresenter.setAborting();
+      this.#commentPresenter.init(this.#film);
+      this.#commentPresenter.setAborting();
+      this.setPopupControlsAborting();
+    } else {
+      this.#filmCardComponent.shake(this.resetFormState);
     }
-    this.#filmCardComponent.shake();
+  };
+
+  resetFormState = () => {
+    this.#filmCardComponent.updateElement({
+      isDisabled: false,
+    });
   };
 
   isOpen = () => this.#mode === Mode.OPENED;

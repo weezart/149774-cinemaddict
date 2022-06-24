@@ -1,5 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
+import {SHAKE_CLASS_NAME, SHAKE_ANIMATION_TIMEOUT} from '../const.js';
 import {getDuration, humanizeDate} from '../utils/film.js';
 
 const createFilmDetailTemplate = (film) => {
@@ -83,9 +84,9 @@ const createFilmDetailTemplate = (film) => {
           </div>
 
           <section class="film-details__controls">
-            <button type="button" class="film-details__control-button film-details__control-button--watchlist ${watchlistClassName}" id="watchlist" name="watchlist">Add to watchlist</button>
-            <button type="button" class="film-details__control-button film-details__control-button--watched ${watchedClassName}" id="watched" name="watched">Already watched</button>
-            <button type="button" class="film-details__control-button film-details__control-button--favorite ${favoriteClassName}" id="favorite" name="favorite">Add to favorites</button>
+            <button type="button" class="film-details__control-button film-details__control-button--watchlist ${watchlistClassName}" id="watchlist" name="watchlist" ${film.isDisabled ? 'disabled' : ''}>Add to watchlist</button>
+            <button type="button" class="film-details__control-button film-details__control-button--watched ${watchedClassName}" id="watched" name="watched" ${film.isDisabled ? 'disabled' : ''}>Already watched</button>
+            <button type="button" class="film-details__control-button film-details__control-button--favorite ${favoriteClassName}" id="favorite" name="favorite" ${film.isDisabled ? 'disabled' : ''}>Add to favorites</button>
           </section>
         </div>
       </form>
@@ -94,16 +95,24 @@ const createFilmDetailTemplate = (film) => {
 };
 
 export default class FilmDetailView extends AbstractStatefulView {
-  #film = null;
-
   constructor(film) {
     super();
 
-    this.#film = film;
+    this._state = FilmDetailView.parseFilmToState(film);
   }
 
+  static parseFilmToState = (film) => ({
+    ...film,
+    scrollTop: null,
+    isDisabled: false,
+  });
+
   get template() {
-    return createFilmDetailTemplate(this.#film);
+    return createFilmDetailTemplate(this._state);
+  }
+
+  get controls() {
+    return this.element.querySelector('.film-details__top-container');
   }
 
   setWatchlistClickHandler = (callback) => {
@@ -131,20 +140,47 @@ export default class FilmDetailView extends AbstractStatefulView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
     this.setWatchedClickHandler(this._callback.watchedClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.element.scrollTop = this._state.scrollTop;
   };
+
+  resetFormState = () => {
+    this.updateElement({
+      isDisabled: false,
+    });
+  };
+
+  shakeControls(callback) {
+    this.controls.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.controls.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
 
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
+    this.updateElement({
+      scrollTop: this.element.scrollTop,
+      isDisabled: true,
+    });
     this._callback.watchlistClick();
   };
 
   #watchedClickHandler = (evt) => {
     evt.preventDefault();
+    this.updateElement({
+      scrollTop: this.element.scrollTop,
+      isDisabled: true,
+    });
     this._callback.watchedClick();
   };
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
+    this.updateElement({
+      scrollTop: this.element.scrollTop,
+      isDisabled: true,
+    });
     this._callback.favoriteClick();
   };
 
