@@ -144,9 +144,7 @@ export default class FilmDetailView extends AbstractStatefulView {
   };
 
   resetFormState = () => {
-    this.updateElement({
-      isDisabled: false,
-    });
+    this.element.querySelector('.film-details__control-button[disabled]').disabled = false
   };
 
   shakeControls(callback) {
@@ -159,28 +157,19 @@ export default class FilmDetailView extends AbstractStatefulView {
 
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
-    this.updateElement({
-      scrollTop: this.element.scrollTop,
-      isDisabled: true,
-    });
+    evt.target.disabled = true;
     this._callback.watchlistClick();
   };
 
   #watchedClickHandler = (evt) => {
     evt.preventDefault();
-    this.updateElement({
-      scrollTop: this.element.scrollTop,
-      isDisabled: true,
-    });
+    evt.target.disabled = true;
     this._callback.watchedClick();
   };
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
-    this.updateElement({
-      scrollTop: this.element.scrollTop,
-      isDisabled: true,
-    });
+    evt.target.disabled = true;
     this._callback.favoriteClick();
   };
 

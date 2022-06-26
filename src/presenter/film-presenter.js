@@ -148,8 +148,6 @@ export default class FilmPresenter {
 
   setAborting = () => {
     if (this.isOpen()) {
-      this.#commentPresenter.init(this.#film);
-      this.#commentPresenter.setAborting();
       this.setPopupControlsAborting();
     } else {
       this.#filmCardComponent.shake(this.resetFormState);
