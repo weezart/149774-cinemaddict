@@ -104,7 +104,7 @@ export default class FilmCommentPresenter {
 
       this.#changeData(
         UserAction.ADD_COMMENT,
-        UpdateType.PATCH,
+        UpdateType.MINOR,
         { ...this.#film, comments: updatedFilm.comments }
       );
     } catch {
