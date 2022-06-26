@@ -4,6 +4,7 @@ export const IS_PRESSED_ESCAPE_KEY = (evt) => evt.key === 'Escape';
 
 export const FILM_COUNT_PER_STEP = 5;
 
+export const EXTRA_FILM_MIN_COUNT = 1;
 export const EXTRA_FILM_COUNT = 2;
 
 export const FilterType = {
