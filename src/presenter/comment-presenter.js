@@ -94,7 +94,6 @@ export default class FilmCommentPresenter {
 
   #handleCommentAdd = async (update) => {
     this.setAdding();
-
     try {
       const updatedFilm = await this.#commentModel.addComment(
         UpdateType.MINOR,

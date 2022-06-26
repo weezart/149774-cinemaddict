@@ -81,6 +81,7 @@ export default class FilmPresenter {
   #showFilmDetail = () => {
     if (this.#mode === Mode.DEFAULT) {
       render(this.#filmPopupComponent, this.#pageBodyElement);
+      this.#filmPopupComponent.updateStyle();
       document.addEventListener('keydown', this.#escKeyDownHandler);
       this.#mode = Mode.OPENED;
       this.#pageBodyElement.classList.add('hide-overflow');
@@ -89,8 +90,10 @@ export default class FilmPresenter {
 
   #hideFilmDetail = () => {
     this.#mode = Mode.DEFAULT;
-    this.#commentPresenter.reset(this.#film);
-    this.#filmPopupComponent.element.remove();
+    if (document.querySelector('.film-details')) {
+      this.#commentPresenter.reset(this.#film);
+      document.querySelector('.film-details').remove();
+    }
     this.#pageBodyElement.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
@@ -149,9 +152,8 @@ export default class FilmPresenter {
   setAborting = () => {
     if (this.isOpen()) {
       this.setPopupControlsAborting();
-    } else {
-      this.#filmCardComponent.shake(this.resetFormState);
     }
+    this.#filmCardComponent.shake(this.resetFormState);
   };
 
   resetFormState = () => {

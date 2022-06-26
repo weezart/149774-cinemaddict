@@ -144,7 +144,13 @@ export default class FilmDetailView extends AbstractStatefulView {
   };
 
   resetFormState = () => {
-    this.element.querySelector('.film-details__control-button[disabled]').disabled = false
+    if (this.element.querySelector('.film-details__control-button[disabled]')) {
+      this.element.querySelector('.film-details__control-button[disabled]').disabled = false;
+    }
+  };
+
+  updateStyle = () => {
+    this.element.style.zIndex = '10';
   };
 
   shakeControls(callback) {
