@@ -23,7 +23,7 @@ const createFilmCardTemplate = (film) => {
         <p class="film-card__rating">${filmInfo.totalRating}</p>
         <p class="film-card__info">
           <span class="film-card__year">${getFilmYear(filmInfo.release.date)}</span>
-          <span class="film-card__duration">${getDuration(filmInfo.runtime)}</span>
+          <span class="film-card__duration">${getDuration(filmInfo.duration)}</span>
           <span class="film-card__genre">${filmInfo.genre[0]}</span>
         </p>
         <img src="${filmInfo.poster}" alt="${filmInfo.title}" class="film-card__poster">
